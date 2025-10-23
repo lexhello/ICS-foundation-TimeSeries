@@ -128,8 +128,7 @@ def get_attack_indices(dataset_name):
 		attacks = []
 		true_labels = []
 
-	# TODO: delete the indexing
-	return attacks[:5], true_labels[:5]
+	return attacks, true_labels
 
 def get_attack_sds(dataset_name):
 

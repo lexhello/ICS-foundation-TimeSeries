@@ -67,7 +67,7 @@ def run_times_series_test(model_name, model, val_dataloader, cfg):
     t_test_ground_list = []
     t_test_labels_list = []
     
-    max_samples = 5
+    max_samples = 20
     if model_name == "timesfm" or model_name == "TimesFM":
         
         print("USING TIMESFM")
@@ -235,11 +235,6 @@ def get_attacks_info(dataset, evasion_type):
 
     elif dataset in ['SWAT', 'WADI']:
         indices, labels = attack_utils.get_attack_indices(dataset)
-        #TODO
-        print("LEN OF INDICES")
-        print(len(indices))
-        
-        
         for i in range(len(indices)):
             attacks_obj.append((f'{dataset}_{i}', labels[i]))
 
@@ -374,7 +369,8 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
         all_attack_ids = np.zeros_like(instance_errors)
 
         indices, _ = attack_utils.get_attack_indices(dataset)
-
+        print("num of attacks: ", len(indices))
+        
         # NOTE: Also hacky, but to match the structure of the other datasets, 
         # we want to segment the entire space by the midpoints between attacks
         attack_midpoints = []
@@ -480,14 +476,27 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
 
         # Do some exploration of different thresholds and their impacts
         print("shape of all_mses: ", all_mses.shape)
-        print("shape of all_labels: ", all_labels.shape)    
+        print("shape of all_labels: ", all_labels.shape)
+        print("all labels: ", all_labels)    
         fpr, tpr, thresholds = roc_curve(all_labels, all_mses)
+        print("FPR: ", fpr)
+        print("TPR: ", tpr)
+        print("thresholds: ", thresholds)
         auroc_idx = np.argmax(tpr-fpr) 
         auroc_threshold = thresholds[auroc_idx]
+        
+        print("auroc_threshold:" , auroc_threshold)
+        print("auroc_threshold shape: ", auroc_threshold.shape)
+        
         this_pred = all_mses > auroc_threshold
         print(f'Best AUROC threshold at: {auroc_threshold:.4f}. TPR: {tpr[auroc_idx]:.4f} FPR {fpr[auroc_idx]:.4f}')
         all_saved_metrics['best-auroc-threshold-tpr'] = tpr[auroc_idx]
         all_saved_metrics['best-auroc-threshold-fpr'] = fpr[auroc_idx]
+        
+        print("this_pred: ", this_pred.shape)
+        print("all saved metrics: ")
+        print(all_saved_metrics)
+        
         print_metrics(this_pred, all_labels, all_saved_metrics, 'best-auroc-threshold')
         get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'best-auroc-threshold')
         print('--' * 15)
