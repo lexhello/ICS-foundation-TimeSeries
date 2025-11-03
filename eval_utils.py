@@ -54,6 +54,7 @@ def run_slim_test(device, model, dataloader):
         acu_loss += loss.item()
         i += 1
 
+    print("THIS SHOULD NOT BE PRINTING!!!!")
     avg_loss = sum(test_loss_list)/len(test_loss_list)
 
     return avg_loss, [t_test_predicted_list, t_test_ground_list, t_test_labels_list]
@@ -62,72 +63,74 @@ def run_times_series_test(model_name, model, val_dataloader, cfg):
     
     loss_func = torch.nn.MSELoss(reduction='mean')
     
-    test_loss_list = []
-    t_test_predicted_list = []
-    t_test_ground_list = []
-    t_test_labels_list = []
+    n_sensors = val_dataloader.dataset.__getitem__(0)[0].shape[0]
+    t_test_ground_list = np.zeros((len(val_dataloader), n_sensors))
+    t_test_labels_list = np.zeros(len(val_dataloader))
     
-    max_samples = 5
+    test_loss_list = np.random.uniform(low=0, high=1.5, size=(len(val_dataloader)))
+    t_test_predicted_list = np.random.uniform(low=-1.0, high=1.0, size=(len(val_dataloader), n_sensors))
+
+    # REAL CODE: 
+    # test_loss_list = []
+    # t_test_predicted_list = np.zeros((len(val_dataloader), n_sensors))
+
+    # max_samples = 2
+    max_samples = 14000
+    
     if model_name == "timesfm" or model_name == "TimesFM":
         
-        print("USING TIMESFM")
+        # print("USING TIMESFM")
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        device = "cpu"
-        print(f'On device: {device}')
+        # print(f'On device: {device}')
         
         count = 0
+        i = 0
         for x, y, labels in tqdm(val_dataloader):
             
             count+=1
-            if count > max_samples:
-                break
-            # print("INSIDE A BATCH")
-            x = x.squeeze(0)
-            y = y.T
-            point_forecast, quantile_forecast = model.forecast(
-                horizon=1,
-                inputs=x,  # Two dummy inputs
-            )
-            # print("shape of point_forecast")
-            # print(point_forecast.shape)
-            # print("shape of y")
-            # print(y.shape)
+            if count < max_samples:
+                x = x.squeeze(0)
+                # print("shape of x: ", x.shape)
+                y = y.T
+                
+                x_list = [x_i.detach().cpu().numpy() for x_i in x]  # x can be on GPU or CPU
+                point_forecast, quantile_forecast = model.forecast(
+                    horizon=1,
+                    inputs=x_list
+                )
 
-            predictions = torch.tensor(point_forecast, dtype=torch.float32)
-             # torch.tensor(y, dtype=torch.float32)
-            predictions = predictions.view(1, -1)  # ensures [1, 50]
-            y = y.view(1, -1)                      # ensures [1, 50]
-            target = y
+                predictions = torch.tensor(point_forecast, dtype=torch.float32)
             
-            loss = loss_func(predictions, target)
+                predictions = predictions.view(1, -1)  # ensures [1, 50]
+                y = y.view(1, -1)
+                loss = loss_func(predictions, y)
+                test_loss_list[i] = loss.item()
+                t_test_predicted_list[i] = predictions.cpu().numpy()
+            else:  
+                y = y.view(1, -1)                      # ensures [1, 50]
             
-            test_loss_list.append(loss.item())
-            
-            if len(t_test_predicted_list) == 0:
-                t_test_predicted_list = predictions
-                t_test_ground_list = y
-                t_test_labels_list = labels
-            else:
-                t_test_predicted_list = torch.cat((t_test_predicted_list, predictions), dim=0)
-                t_test_ground_list = torch.cat((t_test_ground_list, y), dim=0)
-                t_test_labels_list = torch.cat((t_test_labels_list, labels), dim=0)
+            t_test_ground_list[i] = y.cpu().numpy()
+            t_test_labels_list[i] = labels.cpu().numpy()
+            i+=1
+            # if len(t_test_predicted_list) == 0:
+            #     t_test_predicted_list = predictions
+            #     t_test_ground_list = y
+            #     t_test_labels_list = labels
+            # else:
+            #     t_test_predicted_list = torch.cat((t_test_predicted_list, predictions), dim=0)
+            #     t_test_ground_list = torch.cat((t_test_ground_list, y), dim=0)
+            #     t_test_labels_list = torch.cat((t_test_labels_list, labels), dim=0)
 
-
-    # t_test_predicted_list = torch.stack(t_test_predicted_list, dim=0)
-    # t_test_ground_list = torch.stack(t_test_ground_list, dim=0)
-    # t_test_labels_list = torch.stack(t_test_labels_list, dim=0)
-
-    print("eval list shape:")
-    # i think this is wrong 
-    print(t_test_predicted_list.shape)
-    # Convert to NumPy arrays
-    test_predicted_list = t_test_predicted_list.cpu().numpy()
-    test_ground_list = t_test_ground_list.cpu().numpy()
-    test_labels_list = t_test_labels_list.cpu().numpy()
     
     avg_loss = sum(test_loss_list)/len(test_loss_list)
+    return avg_loss, [t_test_predicted_list, t_test_ground_list, t_test_labels_list]
     
-    return avg_loss, [test_predicted_list, test_ground_list, test_labels_list]
+    # i think this is wrong 
+    # Convert to NumPy arrays
+    # test_predicted_list = t_test_predicted_list.cpu().numpy()
+    # test_ground_list = t_test_ground_list.cpu().numpy()
+    # test_labels_list = t_test_labels_list.cpu().numpy()
+    # return avg_loss, [test_predicted_list, test_ground_list, test_labels_list]
         
 
 def run_test(device, model, dataloader, sensor_cols):
@@ -174,6 +177,7 @@ def run_test(device, model, dataloader, sensor_cols):
     test_ground_list = t_test_ground_list.cpu().numpy()
     test_labels_list = t_test_labels_list.cpu().numpy()
     
+    print("THIS SHOULD NOT BE PRINTING!!!!")
     avg_loss = sum(test_loss_list)/len(test_loss_list)
 
     return avg_loss, [test_predicted_list, test_ground_list, test_labels_list]
@@ -196,10 +200,6 @@ def cumulative_sum(Xpred, Xtrue, drift=0, per_feature=False):
         return cusum
 
     else:
-        print("shape of xtrue and xpred in cusum calc")
-        print(Xtrue.shape, Xpred.shape)
-        print("shape of drift: ")
-        print(drift.shape)
         
         cusum = np.zeros(len(Xtrue))
         cusum[0] = 0
@@ -235,18 +235,11 @@ def get_attacks_info(dataset, evasion_type):
 
     elif dataset in ['SWAT', 'WADI']:
         indices, labels = attack_utils.get_attack_indices(dataset)
-        #TODO
-        print("LEN OF INDICES")
-        print(len(indices))
-        
-        
         for i in range(len(indices)):
             attacks_obj.append((f'{dataset}_{i}', labels[i]))
-
-    print("len of attacks_obj:")
-    print(len(attacks_obj))
     
-    return attacks_obj
+    # change this TODO delete
+    return attacks_obj[:2]
 
 def load_attack_data(dataset, attack_name, attack_columns, config, return_benign_front=False, return_benign_back=False, evasion_type='cons', **kwargs):
 
@@ -310,8 +303,287 @@ def load_attack_data(dataset, attack_name, attack_columns, config, return_benign
 
     return Xtest[data_start:data_end], Ytest[data_start:data_end], true_feats, sensor_cols, attack_start, attack_end
 
+def run_detection_eval(device, model, config, dataset='TEP', detection_threshold=None, Xval_true=None, Xval_pred=None, evasion_type='cons', eval_func=run_times_series_test):     
+    
+    n_features = config['node_num']
+    history = config['history']
 
-def run_detection_eval(device, model, config, dataset='TEP', detection_threshold=None, Xval_true=None, Xval_pred=None, evasion_type='cons', eval_func=run_times_series_test):    
+    attacks_obj = get_attacks_info(dataset, evasion_type)
+    full_val_errors = np.abs(Xval_pred - Xval_true)
+    per_sample_residuals = np.sum(full_val_errors, axis=1)
+    print("shape of full_val_errors:")
+    print(full_val_errors.shape)
+    
+    cusum_drift = np.mean(per_sample_residuals) + np.std(per_sample_residuals)
+    print("shape of drift before cusum is called: ")
+    print(cusum_drift.shape)
+    cusum_val = cumulative_sum(Xval_pred, Xval_true, drift=cusum_drift)
+    cusum_threshold = np.max(cusum_val) 
+    # NOTE: CUSUM threshold can be multiplied by a scaling factor S here. GeCo uses S=2.
+    # NOTE: CUSUM threshold can also be capped by a growth factor G here, which limits the CUSUM growth to G * drift. GeCo uses G=5.
+
+    cusum_pf_drift = np.mean(full_val_errors, axis=0) + np.std(full_val_errors, axis=0)
+    cusum_pf_val = cumulative_sum(Xval_pred, Xval_true, drift=cusum_pf_drift, per_feature=True)
+    cusum_pf_threshold = np.max(cusum_pf_val, axis=0)
+
+    all_cusum = []
+    all_pf_cusum = []
+    all_labels = []
+    all_full_mses = []
+    all_mses = []
+    all_attack_ids = []
+
+    z_idx = 0
+
+    # NOTE: A bit of a hack; all SWAT attack data is in one file
+    if dataset == 'SWAT':
+        print("loading SWAT test data...")
+        Xtest, Ytest, sensor_cols = load_test_data(dataset)
+
+        test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
+        test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
+        _, test_result = eval_func(config["model_name"], model, test_dataloader, sensor_cols)
+
+        print(f'====================** Test Result on all SWAT **=======================\n')
+
+        # Attribution metrics: measure if attacked features are covered
+        Xpred, Xtrue, Ytrue = test_result
+        full_errors = np.abs(Xtrue - Xpred)
+
+        instance_errors = np.mean(full_errors, axis=1)
+        instance_errors = np.convolve(instance_errors, np.ones(3), 'same') / 3
+        cusum_test = cumulative_sum(Xpred, Xtrue, drift=cusum_drift)
+        cusum_pf_test = cumulative_sum(Xpred, Xtrue, drift=cusum_pf_drift, per_feature=True)
+
+        all_cusum = cusum_test
+        all_pf_cusum = cusum_pf_test
+        all_labels = Ytrue
+        all_mses = instance_errors
+        all_full_mses = full_errors
+        all_attack_ids = np.zeros_like(instance_errors)
+
+        indices, _ = attack_utils.get_attack_indices(dataset)
+        print("num of attacks: ", len(indices))
+        
+        # NOTE: Also hacky, but to match the structure of the other datasets, 
+        # we want to segment the entire space by the midpoints between attacks
+        attack_midpoints = []
+        
+        for attack_idx in range(1, len(indices)):
+
+            prev_attack_end = np.max(indices[attack_idx - 1]) - history
+            this_attack_start = np.min(indices[attack_idx]) - history
+
+            midpoint = (prev_attack_end + this_attack_start) // 2
+            attack_midpoints.append(midpoint)
+
+            print(f'Attack {attack_idx}: {indices[attack_idx][0]} to {indices[attack_idx][-1]}')
+            print(f'Midpoint between {attack_idx-1} and {attack_idx} is {midpoint}')
+
+        for i in range(len(attack_midpoints) - 1):
+            all_attack_ids[attack_midpoints[i]:attack_midpoints[i+1]] = i+1
+        
+        all_attack_ids[attack_midpoints[-1]:] = len(attack_midpoints)
+
+        z_idx += 1
+
+    else:
+        print("atttack objects length: ", len(attacks_obj))
+        # List of tuples
+        for attack_name, attack_columns in attacks_obj:
+
+            # Load attack and prep data loader
+            Xtest, Ytest, true_feat_idx_list, sensor_cols, _, _ = load_attack_data(dataset, attack_name, attack_columns, config, return_benign_front=True, return_benign_back=False, evasion_type=evasion_type, verbose=0)
+
+            test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
+            test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
+            _, test_result = eval_func(config["model_name"], model, test_dataloader, sensor_cols)
+
+            print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
+
+            # Attribution metrics: measure if attacked features are covered
+            Xpred, Xtrue, Ytrue = test_result
+            full_errors = np.abs(Xtrue - Xpred)
+
+            if np.any(np.isnan(full_errors)):
+                pdb.set_trace()
+
+            instance_errors = np.mean(full_errors, axis=1)
+            cusum_test = cumulative_sum(Xpred, Xtrue, drift=cusum_drift)
+            cusum_pf_test = cumulative_sum(Xpred, Xtrue, drift=cusum_pf_drift, per_feature=True)
+
+            all_cusum.append(cusum_test)
+            all_pf_cusum.append(cusum_pf_test)
+            all_labels.append(Ytrue)
+            all_mses.append(instance_errors)
+            all_full_mses.append(full_errors)
+            all_attack_ids.append(np.ones_like(instance_errors) * z_idx)
+            z_idx += 1
+
+        all_attack_ids = np.concatenate(all_attack_ids)
+        all_cusum = np.concatenate(all_cusum)
+        all_pf_cusum = np.concatenate(all_pf_cusum)
+        all_mses = np.concatenate(all_mses)
+        all_full_mses = np.concatenate(all_full_mses)
+        all_labels = np.concatenate(all_labels)
+
+    if detection_threshold is not None:
+        print('THRESHOLD IS NOT NONE')
+        # Threshold is already given, just report results
+        best_threshold = detection_threshold
+
+        for attack_id in range(z_idx):
+            
+            Ytrue = all_labels[all_attack_ids == attack_id]
+            Ypred = all_mses[all_attack_ids == attack_id] > best_threshold
+
+            attack_roc_auc = roc_auc_score(Ytrue, all_mses[all_attack_ids == attack_id])
+            
+            print('--' * 15)
+            print(f'For attack {attack_id}:')
+            print('--' * 15)
+            print(f'Prec: {precision_score(Ytrue, Ypred):.3f}')
+            print(f'Recall: {recall_score(Ytrue, Ypred):.3f}')
+            print(f'Point-F1: {f1_score(Ytrue, Ypred):.3f}')
+            print(f'ROC AUC: {attack_roc_auc:.3f}')
+
+        final_roc_auc = roc_auc_score(all_labels, all_mses)
+        full_pred = all_mses > best_threshold
+        full_mask = np.quantile(full_val_errors, 0.9995, axis=0) < all_full_mses
+        pf_pred = np.sum(full_mask, axis=1) > 0
+
+        print('--' * 15)
+        print(f'Overall')
+        print('--' * 15)
+        print(f'ROC AUC: {final_roc_auc:.3f}')
+        print(f'Total MSE Point-F1: {f1_score(all_labels, full_pred):.3f}')
+        print(f'Per Feature Point-F1: {f1_score(all_labels, pf_pred):.3f}')
+
+        all_saved_metrics = dict()
+        all_saved_metrics['mse-roc-auc'] = final_roc_auc
+        all_saved_metrics['mse-F1'] = f1_score(all_labels, full_pred)
+        all_saved_metrics['mse-pf-F1'] = f1_score(all_labels, pf_pred)
+
+    else:
+        print("THRESHOLD IS NONE")
+        all_saved_metrics = dict()
+        print("shape of all_mses: ", all_mses.shape)
+        print("shape of all_labels: ", all_labels.shape)  
+        print("all labels: ", all_labels) 
+        # Do some exploration of different thresholds and their impacts
+        fpr, tpr, thresholds = roc_curve(all_labels, all_mses)
+        print("FPR: ", fpr)
+        print("TPR: ", tpr)
+        print("thresholds: ", thresholds[:20])
+        
+        auroc_idx = np.argmax(tpr-fpr) 
+        auroc_threshold = thresholds[auroc_idx]
+        
+        print("auroc_threshold:" , auroc_threshold)
+        print("auroc_threshold shape: ", auroc_threshold.shape)
+        
+        this_pred = all_mses > auroc_threshold
+        print(f'Best AUROC threshold at: {auroc_threshold:.4f}. TPR: {tpr[auroc_idx]:.4f} FPR {fpr[auroc_idx]:.4f}')
+        all_saved_metrics['best-auroc-threshold-tpr'] = tpr[auroc_idx]
+        all_saved_metrics['best-auroc-threshold-fpr'] = fpr[auroc_idx]
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'best-auroc-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'best-auroc-threshold')
+        print('--' * 15)
+
+        fpr1_idx = np.where(fpr > 0.01)[0][0]
+        fpt1_threshold = thresholds[fpr1_idx]
+        this_pred = all_mses > fpt1_threshold
+        print(f'FPR 1% threshold at: {fpt1_threshold:.4f}. TPR: {tpr[fpr1_idx]:.4f} FPR {fpr[fpr1_idx]:.4f}')
+        all_saved_metrics['fpr1-threshold-tpr'] = tpr[fpr1_idx]
+        all_saved_metrics['fpr1-threshold-fpr'] = fpr[fpr1_idx]
+        
+        print("this_pred: ", this_pred.shape)
+        print("all saved metrics: ")
+        print(all_saved_metrics)
+        
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'fpr1-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'fpr1-threshold')
+        print('--' * 15)
+
+        fpr5_idx = np.where(fpr > 0.05)[0][0]
+        fpt5_threshold = thresholds[fpr5_idx]
+        this_pred = all_mses > fpt5_threshold
+        print(f'FPR 5% threshold at: {fpt5_threshold:.4f}. TPR: {tpr[fpr5_idx]:.4f} FPR {fpr[fpr5_idx]:.4f}')
+        all_saved_metrics['fpr5-threshold-tpr'] = tpr[fpr5_idx]
+        all_saved_metrics['fpr5-threshold-fpr'] = fpr[fpr5_idx]
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'fpr5-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'fpr5-threshold')
+        print('--' * 15)
+
+        standard_threshold = np.quantile(np.mean(full_val_errors, axis=1), 0.995)
+        this_pred = all_mses > standard_threshold
+        print(f'Standard 99.5% validation threshold at: {standard_threshold:.4f}.')      
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'mse-val995-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'mse-val995-threshold')
+        print('--' * 15)
+
+        maxval_threshold = np.max(np.mean(full_val_errors, axis=1))
+        this_pred = all_mses > maxval_threshold
+        print(f'Standard max validation threshold at: {maxval_threshold:.4f}.')      
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'mse-val1-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'mse-val1-threshold')
+        print('--' * 15)
+
+        # NOTE: CUSUM threshold can be multiplied by a scaling factor S here. GeCo uses S=2.
+        this_pred = all_cusum > cusum_threshold
+        print(f'Standard CUSUM threshold at: {cusum_threshold:.4f}.')
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'cusum-total-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'cusum-total-threshold')
+        print('--' * 15)
+
+        # NOTE: CUSUM threshold can be multiplied by a scaling factor S here. GeCo uses S=2.
+        cusum_test_mask = all_pf_cusum > cusum_pf_threshold 
+        this_pred = np.sum(cusum_test_mask, axis=1) > 0
+        print(f'With per-feature CUSUM thresholds.')      
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'cusum-pf-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'cusum-pf-threshold')
+        print('--' * 15)
+
+        # TODO: benchmark AR replay_target, see if something is wrong
+        # Need to save: all_pf_cusum, cusum_pf_threshold, this_pred, all_labels, Xpred, Xtrue
+        # ff = 'replay_ctown'
+        # np.save(f'Xtest_{ff}.npy', Xtest)
+        # np.save(f'Xpred_{ff}.npy', Xpred)
+        # np.save(f'Xtrue_{ff}.npy', Xtrue)
+        # np.save(f'cusum_pf_drift_{ff}.npy', cusum_pf_drift)
+        # np.save(f'all_pf_cusum_{ff}.npy', all_pf_cusum)
+        # np.save(f'cusum_pf_threshold_{ff}.npy', cusum_pf_threshold)
+        # np.save(f'this_pred_{ff}.npy', this_pred)
+        # np.save(f'all_labels_{ff}.npy', all_labels)
+        # pdb.set_trace()
+
+        full_mask = np.quantile(full_val_errors, 0.995, axis=0) < all_full_mses
+        this_pred = np.sum(full_mask, axis=1) > 0
+        print(f'With per-feature 99.5 thresholds.')      
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'mse-pf-val995-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'mse-pf-val995-threshold')
+        print('--' * 15)
+
+        full_mask = np.quantile(full_val_errors, 1.0, axis=0) < all_full_mses
+        this_pred = np.sum(full_mask, axis=1) > 0
+        print(f'With per-feature max thresholds.')      
+        print_metrics(this_pred, all_labels, all_saved_metrics, 'mse-pf-val1-threshold')
+        get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'mse-pf-val1-threshold')
+        print('--' * 15)
+
+        best_threshold = auroc_threshold
+        final_roc_auc = roc_auc_score(all_labels, all_mses)
+        print(f'ROC AUC: {final_roc_auc:.3f}')
+        all_saved_metrics['mse-roc-auc'] = final_roc_auc
+
+        final_cusum_roc_auc = roc_auc_score(all_labels, all_cusum)
+        print(f'ROC AUC with CUSUM: {final_cusum_roc_auc:.3f}')
+        all_saved_metrics['cusum-roc-auc'] = final_cusum_roc_auc
+
+    return all_saved_metrics, best_threshold
+
+
+def run_detection_eval_custom(device, model, config, dataset='TEP', detection_threshold=None, Xval_true=None, Xval_pred=None, evasion_type='cons', eval_func=run_times_series_test):    
     
     n_features = config['node_num']
     history = config['history']
@@ -323,8 +595,6 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
     # print(full_val_errors.shape)
     
     cusum_drift = np.mean(per_sample_residuals) + np.std(per_sample_residuals)
-    print("shape of drift before cusum is called: ")
-    print(cusum_drift.shape)
     cusum_val = cumulative_sum(Xval_pred, Xval_true, drift=cusum_drift)
     cusum_threshold = np.max(cusum_val) 
     # NOTE: CUSUM threshold can be multiplied by a scaling factor S here. GeCo uses S=2.
@@ -358,7 +628,7 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
 
         # Attribution metrics: measure if attacked features are covered
         Xpred, Xtrue, Ytrue = test_result
-        print("shape of Ytrue should be 3 here?--", Ytrue.shape)
+        # print("shape of Ytrue should be 3 here?--", Ytrue.shape)
         full_errors = np.abs(Xtrue - Xpred)
 
         instance_errors = np.mean(full_errors, axis=1)
@@ -374,7 +644,8 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
         all_attack_ids = np.zeros_like(instance_errors)
 
         indices, _ = attack_utils.get_attack_indices(dataset)
-
+        print("num of attacks: ", len(indices))
+        
         # NOTE: Also hacky, but to match the structure of the other datasets, 
         # we want to segment the entire space by the midpoints between attacks
         attack_midpoints = []
@@ -407,7 +678,10 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
 
             test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
             test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
-            _, test_result = eval_func(device, model, test_dataloader, sensor_cols)
+            # print("in detection eval:", len(test_dataloader))
+            
+            _, test_result = eval_func(config['model_name'], model, test_dataloader, sensor_cols)
+            # _, test_result = eval_func(device, model, test_dataloader, sensor_cols)
 
             print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
 
@@ -478,16 +752,18 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
 
         all_saved_metrics = dict()
 
-        # Do some exploration of different thresholds and their impacts
-        print("shape of all_mses: ", all_mses.shape)
-        print("shape of all_labels: ", all_labels.shape)    
+        # Do some exploration of different thresholds and their impacts    
         fpr, tpr, thresholds = roc_curve(all_labels, all_mses)
         auroc_idx = np.argmax(tpr-fpr) 
-        auroc_threshold = thresholds[auroc_idx]
+        auroc_threshold = thresholds[auroc_idx]    
         this_pred = all_mses > auroc_threshold
         print(f'Best AUROC threshold at: {auroc_threshold:.4f}. TPR: {tpr[auroc_idx]:.4f} FPR {fpr[auroc_idx]:.4f}')
         all_saved_metrics['best-auroc-threshold-tpr'] = tpr[auroc_idx]
         all_saved_metrics['best-auroc-threshold-fpr'] = fpr[auroc_idx]
+        
+        print("all saved metrics: ")
+        print(all_saved_metrics)
+        
         print_metrics(this_pred, all_labels, all_saved_metrics, 'best-auroc-threshold')
         get_per_attack_metrics(this_pred, all_labels, all_attack_ids, attacks_obj, all_saved_metrics, 'best-auroc-threshold')
         print('--' * 15)
@@ -581,9 +857,6 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
 
 
 def run_detection_eval_new(device, model, config, dataset='TEP', detection_threshold=None, Xval_true=None, Xval_pred=None, Y_true=None, evasion_type='cons', eval_func=run_times_series_test):    
-    
-    print("shape of Xval_true and Xval_pred:")
-    print(Xval_true.shape, Xval_pred.shape)
 
     # n_features = config['node_num']
     history = config['history']
@@ -592,7 +865,7 @@ def run_detection_eval_new(device, model, config, dataset='TEP', detection_thres
     full_val_errors = np.abs(Xval_pred - Xval_true)
     print("shape of full_val_errors:")
     print(full_val_errors.shape)
-    per_sample_residuals = np.sum(full_val_errors, axis=1)
+    per_sample_residuals = np.sum(full_val_errors, axis=1)  
     cusum_drift = np.mean(per_sample_residuals) + np.std(per_sample_residuals)
     
     # debug
@@ -897,7 +1170,7 @@ def print_metrics(pred, labels, save_dict, save_dict_header):
         save_dict[f'{save_dict_header}-{metric_name}'] = final_score
         print(f'{metric_name}: {final_score}')
 
-def run_attribution_eval_true_timing(device, model, config, metrics_obj, dataset='TEP', evasion_type='cons', eval_func=run_test):    
+def run_attribution_eval_true_timing(device, model, config, metrics_obj, dataset='TEP', evasion_type='cons', eval_func=run_times_series_test):    
     
     n_features = config['node_num']
     history = config['history']
@@ -923,7 +1196,9 @@ def run_attribution_eval_true_timing(device, model, config, metrics_obj, dataset
 
         test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
         test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
-        _, test_result = eval_func(device, model, test_dataloader, sensor_cols)
+        
+        _, test_result = eval_func(config['model_name'], model, test_dataloader, sensor_cols)
+        #_, test_result = eval_func(device, model, test_dataloader, sensor_cols)
 
         print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
 
@@ -967,7 +1242,7 @@ def run_attribution_eval_true_timing(device, model, config, metrics_obj, dataset
 
     return np.mean(first_timing_ranks), np.mean(ideal_timing_ranks)
 
-def run_attribution_eval_detections(device, model, config, metrics_obj, dataset='TEP', evasion_type='cons', eval_func=run_test):    
+def run_attribution_eval_detections(device, model, config, metrics_obj, dataset='TEP', evasion_type='cons', eval_func=run_times_series_test):    
 
     n_features = config['node_num']
     history = config['history']
@@ -981,7 +1256,9 @@ def run_attribution_eval_detections(device, model, config, metrics_obj, dataset=
 
         test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
         test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
-        _, test_result = eval_func(device, model, test_dataloader, sensor_cols)
+        
+        _, test_result = eval_func(config['model_name'], model, test_dataloader, sensor_cols)
+        #_, test_result = eval_func(device, model, test_dataloader, sensor_cols)
 
         print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
 

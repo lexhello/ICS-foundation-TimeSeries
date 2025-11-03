@@ -1,0 +1,182 @@
+Running model: timesfm on dataset: TEP
+On device: cuda
+timesfm TEP: run #1
+No scaler provided, trying to load from checkpoints directory...
+history:  32
+Validation samples: 620
+Validation batches: 620
+avg validation loss of  timesfm is: 
+16.04987117123411
+shape of full_val_errors:
+(620, 53)
+shape of drift before cusum is called: 
+()
+atttack objects length:  2
+====================** Test Result cons_p2s_s1 on s1 at true idx: [0] **=======================
+
+====================** Test Result cons_p2s_s2 on s2 at true idx: [1] **=======================
+
+THRESHOLD IS NONE
+shape of all_mses:  (27936,)
+shape of all_labels:  (27936,)
+all labels:  [0. 0. 0. ... 1. 1. 1.]
+FPR:  [0.00000000e+00 1.00321027e-04 3.00963082e-04 ... 9.99799358e-01
+ 1.00000000e+00 1.00000000e+00]
+TPR:  [0.       0.       0.       ... 0.999625 0.999625 1.      ]
+thresholds:  [       inf 0.75929104 0.70866856 0.69135618 0.66184375 0.65757336
+ 0.65415694 0.64993205 0.64873188 0.64722403 0.64124383 0.63672529
+ 0.63551963 0.63412027 0.62037112 0.61523736 0.60805946 0.59835005
+ 0.59786007 0.59541397]
+auroc_threshold: 0.5429427249365687
+auroc_threshold shape:  ()
+Best AUROC threshold at: 0.5429. TPR: 0.0044 FPR 0.0042
+precision: 0.288135593220339
+recall: 0.00425
+F1: 0.008376447400837645
+FP: 66
+TP: 2
+SF1: 0.05714285714285715
+TAF1: 0.37392426277915963
+NAB: -0.8823529411764706
+best-auroc-threshold cons_p2s_s1: detect t=1, recall = 0.004
+best-auroc-threshold cons_p2s_s2: detect t=1, recall = 0.0045
+------------------------------
+FPR 1% threshold at: 0.4316. TPR: 0.0090 FPR 0.0103
+this_pred:  (27936,)
+all saved metrics: 
+{'best-auroc-threshold-tpr': np.float64(0.004375), 'best-auroc-threshold-fpr': np.float64(0.004213483146067416), 'best-auroc-threshold-precision': np.float64(0.288135593220339), 'best-auroc-threshold-recall': np.float64(0.00425), 'best-auroc-threshold-F1': np.float64(0.008376447400837645), 'best-auroc-threshold-FP': 66, 'best-auroc-threshold-TP': 2, 'best-auroc-threshold-SF1': 0.05714285714285715, 'best-auroc-threshold-TAF1': np.float64(0.37392426277915963), 'best-auroc-threshold-NAB': np.float64(-0.8823529411764706), 'best-auroc-threshold-per-attack': {'cons_p2s_s1': {'detect_start': 1, 'recall': np.float64(0.004)}, 'cons_p2s_s2': {'detect_start': 1, 'recall': np.float64(0.0045)}}, 'fpr1-threshold-tpr': np.float64(0.009), 'fpr1-threshold-fpr': np.float64(0.0103330658105939)}
+precision: 0.2608695652173913
+recall: 0.009
+F1: 0.01739971000483325
+FP: 120
+TP: 2
+SF1: 0.03225806451612903
+TAF1: 0.3464490989088665
+NAB: -0.9344262295081968
+fpr1-threshold cons_p2s_s1: detect t=1, recall = 0.0095
+fpr1-threshold cons_p2s_s2: detect t=1, recall = 0.0085
+------------------------------
+FPR 5% threshold at: 0.3572. TPR: 0.0335 FPR 0.0503
+precision: 0.2113564668769716
+recall: 0.0335
+F1: 0.05783340526542943
+FP: 828
+TP: 2
+SF1: 0.004807692307692308
+TAF1: 0.29548690756352586
+NAB: -0.9903614457831326
+fpr5-threshold cons_p2s_s1: detect t=0, recall = 0.04025
+fpr5-threshold cons_p2s_s2: detect t=0, recall = 0.02675
+------------------------------
+Standard 99.5% validation threshold at: 1.8218.
+precision: 0
+recall: 0.0
+F1: 0
+FP: -1
+TP: 0
+SF1: 0
+TAF1: 0.0
+NAB: -1.0
+mse-val995-threshold cons_p2s_s1: detect t=-1, recall = 0.0
+mse-val995-threshold cons_p2s_s2: detect t=-1, recall = 0.0
+------------------------------
+Standard max validation threshold at: 1.9414.
+precision: 0
+recall: 0.0
+F1: 0
+FP: -1
+TP: 0
+SF1: 0
+TAF1: 0.0
+NAB: -1.0
+mse-val1-threshold cons_p2s_s1: detect t=-1, recall = 0.0
+mse-val1-threshold cons_p2s_s2: detect t=-1, recall = 0.0
+------------------------------
+Standard CUSUM threshold at: 66.7622.
+precision: 0
+recall: 0.0
+F1: 0
+FP: -1
+TP: 0
+SF1: 0
+TAF1: 0.0
+NAB: -1.0
+cusum-total-threshold cons_p2s_s1: detect t=-1, recall = 0.0
+cusum-total-threshold cons_p2s_s2: detect t=-1, recall = 0.0
+------------------------------
+With per-feature CUSUM thresholds.
+precision: 0.286389346316317
+recall: 1.0
+F1: 0.445260755830133
+FP: 0
+TP: 2
+SF1: 1.0
+TAF1: 0.445260755830133
+NAB: 1.0
+cusum-pf-threshold cons_p2s_s1: detect t=0, recall = 1.0
+cusum-pf-threshold cons_p2s_s2: detect t=0, recall = 1.0
+------------------------------
+With per-feature 99.5 thresholds.
+precision: 0.286368843069874
+recall: 1.0
+F1: 0.4452359750667854
+FP: 0
+TP: 2
+SF1: 1.0
+TAF1: 0.4452359750667854
+NAB: 1.0
+mse-pf-val995-threshold cons_p2s_s1: detect t=0, recall = 1.0
+mse-pf-val995-threshold cons_p2s_s2: detect t=0, recall = 1.0
+------------------------------
+With per-feature max thresholds.
+precision: 0.286368843069874
+recall: 1.0
+F1: 0.4452359750667854
+FP: 0
+TP: 2
+SF1: 1.0
+TAF1: 0.4452359750667854
+NAB: 1.0
+mse-pf-val1-threshold cons_p2s_s1: detect t=0, recall = 1.0
+mse-pf-val1-threshold cons_p2s_s2: detect t=0, recall = 1.0
+------------------------------
+ROC AUC: 0.449
+ROC AUC with CUSUM: 0.500
+Loading TEP attack cons_p2s_s1...
+No scaler provided, loading from models directory.
+====================** Test Result cons_p2s_s1 on s1 at true idx: [0] **=======================
+
+Loading TEP attack cons_p2s_s2...
+No scaler provided, loading from models directory.
+====================** Test Result cons_p2s_s2 on s2 at true idx: [1] **=======================
+
+---------------
+How many features were searched?
+best-auroc-threshold-per-attack: detection avgrank 3.5
+fpr1-threshold-per-attack: detection avgrank 3.5
+fpr5-threshold-per-attack: detection avgrank 1.5
+mse-val995-threshold-per-attack: detection avgrank nan
+mse-val1-threshold-per-attack: detection avgrank nan
+cusum-total-threshold-per-attack: detection avgrank nan
+cusum-pf-threshold-per-attack: detection avgrank 1.5
+mse-pf-val995-threshold-per-attack: detection avgrank 1.5
+mse-pf-val1-threshold-per-attack: detection avgrank 1.5
+---------------
+Loading TEP attack cons_p2s_s1...
+No scaler provided, loading from models directory.
+====================** Test Result cons_p2s_s1 on s1 at true idx: [0] **=======================
+
+Loading TEP attack cons_p2s_s2...
+No scaler provided, loading from models directory.
+====================** Test Result cons_p2s_s2 on s2 at true idx: [1] **=======================
+
+---------------
+AvgRank: first timing: 0.02830188679245283 ideal timing: 0.8679245283018868
+Top-3 Matches: first timing: 2 / 2 ideal timing: 0 / 2
+---------------
+How many features were searched? first timing: 1.5 ideal timing: 46.0
+---------------
+========================================
+Final stats for timesfm. ROC AUC 0.449 CUSUM ROC AUC 0.500 AvgRank: 1.500
+Writing timesfm_TEP_ta_metrics.json
+Done

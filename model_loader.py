@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/pwwl/python_libs")
 import numpy as np
 import torch
 import timesfm
@@ -11,7 +13,6 @@ import pandas as pd
 from tqdm import tqdm
 import pandas as pd  # requires: pip install pandas
 import torch
-from chronos import BaseChronosPipeline
 from eval_utils import run_times_series_test
 
 #TODO: delete
@@ -36,8 +37,8 @@ def load_model(model_name: str, cfg):
 
         model.compile(
             timesfm.ForecastConfig(
-                max_context=1024,
-                max_horizon=256,
+                max_context=cfg['history'],
+                max_horizon=1,
                 normalize_inputs=True,
                 use_continuous_quantile_head=True,
                 force_flip_invariance=True,
@@ -81,7 +82,6 @@ def load_model(model_name: str, cfg):
 def load_test(model_name, dataset):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    device = "cpu"
     print(f'On device: {device}')
 
     # CHANGE THESE VALUES
@@ -114,26 +114,15 @@ def load_test(model_name, dataset):
 
     # use this once it's set up
     # model_utils.load_model_params_from_args(args, cfg)
+    
     # context length
-    model_params_history = 32
     run_number = 1
     cfg.update({
-        'history': model_params_history,
+        'history': 32,
         'run_number': run_number,
-        # 'gnn_topk': gnn_model_params_topk,
-        # 'gcn_degree': args.gcn_model_params_degree,
-        # 'gcn_weight_strategy': args.gcn_model_params_weight_strategy,
-        
-        # 'gcn_graph_spec': args.gcn_graph_spec,
-
-        # Kept from AAAI '21 implementation
-        # 'embedding_dim': 64,
-        # 'out_layer_num': 1,
-        # 'out_layer_inter_dim': 128,
-        'slide_stride': 1,
-
+        'slide_stride': 31,
     })
-    
+    print("history: ", cfg['history'])
     model = load_model(model_name, cfg)
     
     # NOTE: Added a custom function, since the RICSS CTOWN dataset is stored across 52 training files
@@ -160,29 +149,29 @@ def load_test(model_name, dataset):
 
     if do_test:
         avg_loss, val_result = run_times_series_test(model_name, model, val_dataloader, cfg)
-        print("average loss of ", model_name, "is: ")
+        print("avg validation loss of ", model_name, "is: ")
         print(avg_loss)
         
         Xval_pred, Xval_true, Y_true = val_result
-        # print("shape of Xval_pred:")
-        # shape is 
-        # print(Xval_pred.shape)
         
-        # gets weird here
         all_saved_metrics, _ = eval_utils.run_detection_eval(device, model, cfg, dataset=dataset, Xval_true=Xval_true, Xval_pred=Xval_pred, detection_threshold=None, evasion_type=evasion_type)
-        return
         # all_saved_metrics['true-timing-avgrank'] = final_first_timing_avgrank # Keep for legacy plots
         final_roc_auc = all_saved_metrics['mse-roc-auc']
         final_cusum_roc_auc = all_saved_metrics['cusum-roc-auc']
         
-        # eval_utils.run_attribution_eval_detections(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
- 
+        eval_utils.run_attribution_eval_detections(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
+        final_first_timing_avgrank, final_ideal_timing_avgrank = eval_utils.run_attribution_eval_true_timing(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
+
         print('==' * 20)
         
         if evasion_type == 'cons':
             print(f'Final stats for {model_name}. ROC AUC {final_roc_auc:.3f} CUSUM ROC AUC {final_cusum_roc_auc:.3f} AvgRank: {final_first_timing_avgrank:.3f}')
-            # json_filename = f'{model_name}_ta_metrics.json'
+            json_filename = f'{model_name}_{dataset}_ta_metrics.json'
         
+        with open(json_filename, 'w') as file:
+            print(f'Writing {json_filename}')
+            json.dump(all_saved_metrics, file, indent=4)
+            
         """
         
         # else:
@@ -200,14 +189,16 @@ def load_test(model_name, dataset):
     print('Done')
 
 if __name__ == "__main__":
-    # load_model("TimeGPT")
-    # load_model("timesfm")
+    # Example usage:
+    # python3 main.py timesfm TEP
 
-    # model_names = ["timesfm", "chronos"]
-    model_names = ["timesfm"]
-    dataset = "SWAT"
-    
-    for model_name in model_names:
-        load_test(model_name=model_name, dataset=dataset)
-    
+    if len(sys.argv) != 3:
+        print("Usage: python3 main.py <model_name> <dataset>")
+        sys.exit(1)
+
+    model_name = sys.argv[1]
+    dataset = sys.argv[2]
+
+    print(f"Running model: {model_name} on dataset: {dataset}")
+    load_test(model_name=model_name, dataset=dataset)
     

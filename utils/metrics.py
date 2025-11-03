@@ -249,11 +249,13 @@ def segment_ppv(ypred, ytrue):
 	return tps / (tps + fps)
 
 def segment_tpr(ypred, ytrue):
-
-	true_starts, _ = to_segments(ytrue)
-	segment_recall = true_positive_segments(ypred, ytrue) / len(true_starts)
-
-	return segment_recall
+    true_starts, _ = to_segments(ytrue)
+    if len(true_starts)==0:
+        print("no positive ytrue predictions")
+        segment_recall = 0.0
+    else:
+        segment_recall = true_positive_segments(ypred, ytrue) / len(true_starts)
+        return segment_recall
 
 # Segment F1, precision 3 times more important
 def segment_f1(ypred, ytrue):

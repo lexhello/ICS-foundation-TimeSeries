@@ -1,0 +1,26 @@
+docker run -ti -v /mnt/clementf-ics:/pwwl --gpus all pwwl/pwwl-torch:latest /bin/bash
+
+pip install -r requirements.txt
+
+# run this inside timesfm
+# pip install -e .[torch]
+pip install .[torch] --target /pwwl/python_libs
+
+
+# keeps the container running in the background
+Ctrl + P  Ctrl + Q
+
+# list containers
+docker ps
+
+docker attach <name>
+
+
+# run if no storage
+export TMPDIR=/pwwl/tmp
+mkdir -p /pwwl/tmp
+pip install --no-cache-dir -r requirements.txt --target /pwwl/python_libs
+
+export PYTHONPATH=/pwwl/python_libs:$PYTHONPATH
+
+pip install "huggingface_hub<0.26"
