@@ -646,6 +646,8 @@ def run_detection_eval_custom(device, model, config, dataset='TEP', detection_th
         indices, _ = attack_utils.get_attack_indices(dataset)
         print("num of attacks: ", len(indices))
         
+        print("num of attacks: ", len(indices))
+        
         # NOTE: Also hacky, but to match the structure of the other datasets, 
         # we want to segment the entire space by the midpoints between attacks
         attack_midpoints = []
@@ -754,6 +756,9 @@ def run_detection_eval_custom(device, model, config, dataset='TEP', detection_th
 
         # Do some exploration of different thresholds and their impacts    
         fpr, tpr, thresholds = roc_curve(all_labels, all_mses)
+        print("FPR: ", fpr)
+        print("TPR: ", tpr)
+        print("thresholds: ", thresholds)
         auroc_idx = np.argmax(tpr-fpr) 
         auroc_threshold = thresholds[auroc_idx]    
         this_pred = all_mses > auroc_threshold
