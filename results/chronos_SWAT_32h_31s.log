@@ -1,0 +1,238 @@
+Running model: Chronos on dataset: SWAT
+On device: cuda
+Chronos SWAT: run #1
+No scaler provided, trying to load from checkpoints directory...
+history:  32
+Validation samples: 2903
+Validation batches: 182
+On device: cuda
+avg validation loss of  Chronos is: 
+0.022229937483372778
+loading SWAT test data...
+No scaler provided, trying to load from checkpoints directory...
+On device: cuda
+test loss:  0.020989962504162584
+====================** Test Result on all SWAT **=======================
+
+num of attacks:  32
+Attack 1: 3046 to 3489
+Midpoint between 0 and 1 is 2826
+Attack 2: 4901 to 5281
+Midpoint between 1 and 2 is 4163
+Attack 3: 7233 to 7430
+Midpoint between 2 and 3 is 6225
+Attack 4: 7685 to 8112
+Midpoint between 3 and 4 is 7525
+Attack 5: 11385 to 12354
+Midpoint between 4 and 5 is 9716
+Attack 6: 15361 to 16082
+Midpoint between 5 and 6 is 13825
+Attack 7: 90662 to 90916
+Midpoint between 6 and 7 is 53340
+Attack 8: 93424 to 93704
+Midpoint between 7 and 8 is 92138
+Attack 9: 103092 to 103796
+Midpoint between 8 and 9 is 98366
+Attack 10: 115822 to 116079
+Midpoint between 9 and 10 is 109777
+Attack 11: 116123 to 116514
+Midpoint between 10 and 11 is 116069
+Attack 12: 116999 to 117699
+Midpoint between 11 and 12 is 116724
+Attack 13: 132896 to 133361
+Midpoint between 12 and 13 is 125265
+Attack 14: 142927 to 143610
+Midpoint between 13 and 14 is 138112
+Attack 15: 172268 to 172587
+Midpoint between 14 and 15 is 157907
+Attack 16: 172892 to 173498
+Midpoint between 15 and 16 is 172707
+Attack 17: 198273 to 199715
+Midpoint between 16 and 17 is 185853
+Attack 18: 227828 to 228360
+Midpoint between 17 and 18 is 213739
+Attack 19: 229519 to 263726
+Midpoint between 18 and 19 is 228907
+Attack 20: 280023 to 281183
+Midpoint between 19 and 20 is 271842
+Attack 21: 302653 to 303018
+Midpoint between 20 and 21 is 291886
+Attack 22: 347718 to 348314
+Midpoint between 21 and 22 is 325336
+Attack 23: 361243 to 361673
+Midpoint between 22 and 23 is 354746
+Attack 24: 371519 to 371617
+Midpoint between 23 and 24 is 366564
+Attack 25: 371893 to 372373
+Midpoint between 24 and 25 is 371723
+Attack 26: 389746 to 390261
+Midpoint between 25 and 26 is 381027
+Attack 27: 436672 to 437045
+Midpoint between 26 and 27 is 413434
+Attack 28: 437455 to 437734
+Midpoint between 27 and 28 is 437218
+Attack 29: 438184 to 438582
+Midpoint between 28 and 29 is 437927
+Attack 30: 438659 to 438954
+Midpoint between 29 and 30 is 438588
+Attack 31: 443540 to 445190
+Midpoint between 30 and 31 is 441215
+THRESHOLD IS NONE
+shape of all_mses:  (449887,)
+shape of all_labels:  (449887,)
+all labels:  [0. 0. 0. ... 0. 0. 0.]
+FPR:  [0.00000000e+00 2.51063253e-06 2.51063253e-06 ... 9.99997489e-01
+ 1.00000000e+00 1.00000000e+00]
+TPR:  [0.00000000e+00 0.00000000e+00 1.93869836e-05 ... 5.66196855e-01
+ 5.66196855e-01 1.00000000e+00]
+thresholds:  [       inf 0.9319967  0.82430582 0.81241999 0.69959318 0.64168776
+ 0.63665108 0.6256485  0.58175974 0.54087127 0.51912701 0.50573086
+ 0.48083926 0.47794286 0.47262304 0.47159138 0.45464826 0.43664884
+ 0.4359824  0.41689436]
+auroc_threshold: 0.31240218655138163
+auroc_threshold shape:  ()
+Best AUROC threshold at: 0.3124. TPR: 0.0009 FPR 0.0003
+precision: 0.26744186046511625
+recall: 0.0008918012446443458
+F1: 0.0017776747241705795
+FP: 102
+TP: 9
+SF1: 0.1258741258741259
+TAF1: 0.1441416067861065
+NAB: -0.7352941176470589
+best-auroc-threshold SWAT_0: detect t=-1, recall = 0.0
+best-auroc-threshold SWAT_1: detect t=104, recall = 0.0022522522522522522
+best-auroc-threshold SWAT_2: detect t=-1, recall = 0.0
+------------------------------
+FPR 1% threshold at: 0.1024. TPR: 0.0083 FPR 0.0101
+this_pred:  (449887,)
+all saved metrics: 
+{'best-auroc-threshold-tpr': np.float64(0.0009111882282235707), 'best-auroc-threshold-fpr': np.float64(0.00031633969862367124), 'best-auroc-threshold-precision': np.float64(0.26744186046511625), 'best-auroc-threshold-recall': np.float64(0.0008918012446443458), 'best-auroc-threshold-F1': np.float64(0.0017776747241705795), 'best-auroc-threshold-FP': 102, 'best-auroc-threshold-TP': 9, 'best-auroc-threshold-SF1': 0.1258741258741259, 'best-auroc-threshold-TAF1': np.float64(0.1441416067861065), 'best-auroc-threshold-NAB': np.float64(-0.7352941176470589), 'best-auroc-threshold-per-attack': {'SWAT_0': {'detect_start': -1, 'recall': np.float64(0.0)}, 'SWAT_1': {'detect_start': 104, 'recall': np.float64(0.0022522522522522522)}, 'SWAT_2': {'detect_start': -1, 'recall': np.float64(0.0)}}, 'fpr1-threshold-tpr': np.float64(0.00829762897190826), 'fpr1-threshold-fpr': np.float64(0.010070147072853535)}
+precision: 0.0964398377647589
+recall: 0.00829762897190826
+F1: 0.01528052982023956
+FP: 1147
+TP: 21
+SF1: 0.034999999999999996
+TAF1: 0.13902351563866022
+NAB: -0.9310924369747899
+fpr1-threshold SWAT_0: detect t=-1, recall = 0.0
+fpr1-threshold SWAT_1: detect t=95, recall = 0.06306306306306306
+fpr1-threshold SWAT_2: detect t=-1, recall = 0.0
+------------------------------
+FPR 5% threshold at: 0.0152. TPR: 0.0299 FPR 0.0501
+precision: 0.07180417888221881
+recall: 0.029914115662744035
+F1: 0.042233474750239496
+FP: 3131
+TP: 32
+SF1: 0.02003129890453834
+TAF1: 0.10727647041273376
+NAB: -0.9600748596381784
+fpr5-threshold SWAT_0: detect t=0, recall = 0.018201284796573874
+fpr5-threshold SWAT_1: detect t=0, recall = 0.22072072072072071
+fpr5-threshold SWAT_2: detect t=85, recall = 0.06824146981627296
+------------------------------
+Standard 99.5% validation threshold at: 0.1869.
+precision: 0.12687813021702837
+recall: 0.002946821504042186
+F1: 0.005759866613615263
+FP: 435
+TP: 12
+SF1: 0.050104384133611686
+TAF1: 0.1337401930915591
+NAB: -0.9027484143763214
+mse-val995-threshold SWAT_0: detect t=-1, recall = 0.0
+mse-val995-threshold SWAT_1: detect t=96, recall = 0.015765765765765764
+mse-val995-threshold SWAT_2: detect t=-1, recall = 0.0
+------------------------------
+Standard max validation threshold at: 0.5185.
+precision: 0.6153846153846154
+recall: 0.00031019173726759856
+F1: 0.0006200709206115449
+FP: 4
+TP: 3
+SF1: 0.15384615384615383
+TAF1: 0.08671848377747875
+NAB: -0.6666666666666666
+mse-val1-threshold SWAT_0: detect t=-1, recall = 0.0
+mse-val1-threshold SWAT_1: detect t=-1, recall = 0.0
+mse-val1-threshold SWAT_2: detect t=-1, recall = 0.0
+------------------------------
+Standard CUSUM threshold at: 32.8378.
+precision: 0.10241420716678253
+recall: 0.06283321378026793
+F1: 0.0778833791918488
+FP: 158
+TP: 18
+SF1: 0.17307692307692307
+TAF1: 0.14080919786975005
+NAB: -0.6482412060301508
+cusum-total-threshold SWAT_0: detect t=-1, recall = 0.0
+cusum-total-threshold SWAT_1: detect t=97, recall = 0.4954954954954955
+cusum-total-threshold SWAT_2: detect t=-1, recall = 0.0
+------------------------------
+With per-feature CUSUM thresholds.
+precision: 0.11421476650818688
+recall: 0.9924778503712607
+F1: 0.20485476132357472
+FP: 4
+TP: 32
+SF1: 0.9411764705882353
+TAF1: 0.20028689015196527
+NAB: 0.8823529411764706
+cusum-pf-threshold SWAT_0: detect t=0, recall = 0.5845824411134903
+cusum-pf-threshold SWAT_1: detect t=0, recall = 1.0
+cusum-pf-threshold SWAT_2: detect t=0, recall = 1.0
+------------------------------
+With per-feature 99.5 thresholds.
+precision: 0.44196362923386107
+recall: 0.6992109497683255
+F1: 0.5415925216803694
+FP: 24570
+TP: 32
+SF1: 0.0025980352358528865
+TAF1: 0.09331136021391981
+NAB: -0.9947994962011945
+mse-pf-val995-threshold SWAT_0: detect t=0, recall = 0.07601713062098502
+mse-pf-val995-threshold SWAT_1: detect t=0, recall = 0.3333333333333333
+mse-pf-val995-threshold SWAT_2: detect t=0, recall = 0.16010498687664043
+------------------------------
+With per-feature max thresholds.
+precision: 0.9336279376739648
+recall: 0.6307748977336616
+F1: 0.7528867291449727
+FP: 1559
+TP: 30
+SF1: 0.03701418877236274
+TAF1: 0.16218032738205412
+NAB: -0.9260188087774295
+mse-pf-val1-threshold SWAT_0: detect t=2, recall = 0.0010706638115631692
+mse-pf-val1-threshold SWAT_1: detect t=0, recall = 0.04054054054054054
+mse-pf-val1-threshold SWAT_2: detect t=257, recall = 0.007874015748031496
+------------------------------
+ROC AUC: 0.198
+ROC AUC with CUSUM: 0.486
+No scaler provided, trying to load from checkpoints directory...
+On device: cuda
+
+=== Attack SWAT_0 on ['MV101'] ===
+Attack loss: 0.0023665806446972995
+No scaler provided, trying to load from checkpoints directory...
+On device: cuda
+
+=== Attack SWAT_1 on ['P102'] ===
+Attack loss: 0.1271845650905963
+No scaler provided, trying to load from checkpoints directory...
+On device: cuda
+
+=== Attack SWAT_2 on ['LIT101'] ===
+Attack loss: 0.006521662166647245
+---------------
+Avg true timing rank: 0.047
+Avg ideal timing rank: 0.540
+---------------
+========================================
+Final stats for Chronos. ROC AUC 0.198 CUSUM ROC AUC 0.486 AvgRank: 2.333
+Writing Chronos_SWAT_ta_metrics.json
+Done

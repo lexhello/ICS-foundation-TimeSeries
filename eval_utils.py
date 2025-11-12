@@ -59,78 +59,226 @@ def run_slim_test(device, model, dataloader):
 
     return avg_loss, [t_test_predicted_list, t_test_ground_list, t_test_labels_list]
 
-def run_times_series_test(model_name, model, val_dataloader, cfg):
+def run_times_series_test(model_name, model, val_dataloader, cfg, dataname):
     
     loss_func = torch.nn.MSELoss(reduction='mean')
     
     n_sensors = val_dataloader.dataset.__getitem__(0)[0].shape[0]
-    t_test_ground_list = np.zeros((len(val_dataloader), n_sensors))
-    t_test_labels_list = np.zeros(len(val_dataloader))
     
-    test_loss_list = np.random.uniform(low=0, high=1.5, size=(len(val_dataloader)))
-    t_test_predicted_list = np.random.uniform(low=-1.0, high=1.0, size=(len(val_dataloader), n_sensors))
+    # Calculate total number of samples (not batches)
+    total_samples = len(val_dataloader.dataset)
+    
+    t_test_ground_list = np.zeros((total_samples, n_sensors))
+    t_test_labels_list = np.zeros(total_samples)
+    test_loss_list = np.zeros(total_samples)
+    t_test_predicted_list = np.zeros((total_samples, n_sensors))
 
-    # REAL CODE: 
-    # test_loss_list = []
-    # t_test_predicted_list = np.zeros((len(val_dataloader), n_sensors))
-
-    # max_samples = 2
-    max_samples = 14000
+    max_samples = total_samples + 1
+    max_sample = 60
     
     if model_name == "timesfm" or model_name == "TimesFM":
         
-        # print("USING TIMESFM")
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        # print(f'On device: {device}')
+        print(f'On device: {device} (batch_size=1 required for TimesFM)')
         
-        count = 0
-        i = 0
+        sample_idx = 0
         for x, y, labels in tqdm(val_dataloader):
             
-            count+=1
-            if count < max_samples:
+            if sample_idx < max_samples:
                 x = x.squeeze(0)
-                # print("shape of x: ", x.shape)
                 y = y.T
                 
-                x_list = [x_i.detach().cpu().numpy() for x_i in x]  # x can be on GPU or CPU
+                x_list = [x_i.detach().cpu().numpy() for x_i in x]
                 point_forecast, quantile_forecast = model.forecast(
                     horizon=1,
                     inputs=x_list
                 )
-
+                
                 predictions = torch.tensor(point_forecast, dtype=torch.float32)
             
-                predictions = predictions.view(1, -1)  # ensures [1, 50]
+                predictions = predictions.view(1, -1)
                 y = y.view(1, -1)
                 loss = loss_func(predictions, y)
-                test_loss_list[i] = loss.item()
-                t_test_predicted_list[i] = predictions.cpu().numpy()
+                
+                test_loss_list[sample_idx] = loss.item()
+                t_test_predicted_list[sample_idx] = predictions.cpu().numpy()
             else:  
-                y = y.view(1, -1)                      # ensures [1, 50]
+                y = y.view(1, -1)
             
-            t_test_ground_list[i] = y.cpu().numpy()
-            t_test_labels_list[i] = labels.cpu().numpy()
-            i+=1
-            # if len(t_test_predicted_list) == 0:
-            #     t_test_predicted_list = predictions
-            #     t_test_ground_list = y
-            #     t_test_labels_list = labels
-            # else:
-            #     t_test_predicted_list = torch.cat((t_test_predicted_list, predictions), dim=0)
-            #     t_test_ground_list = torch.cat((t_test_ground_list, y), dim=0)
-            #     t_test_labels_list = torch.cat((t_test_labels_list, labels), dim=0)
+            t_test_ground_list[sample_idx] = y.cpu().numpy()
+            t_test_labels_list[sample_idx] = labels.cpu().numpy()
+            sample_idx += 1
 
+    if model_name == "chronos" or model_name == "Chronos":
+        
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f'On device: {device}')
+        
+        sample_idx = 0
+        for x, y, labels in tqdm(val_dataloader):
+            
+            # x shape: (batch_size, n_sensors, history_length)
+            # y shape: (batch_size, n_sensors) or (batch_size, n_sensors, 1)
+            
+            batch_size = x.shape[0]
+            
+            if sample_idx < max_samples:
+                # Flatten all sensors from all batch samples into one list
+                # This allows Chronos to process the entire batch efficiently
+                all_sensors = []
+                for batch_idx in range(batch_size):
+                    for sensor_idx in range(n_sensors):
+                        all_sensors.append(x[batch_idx, sensor_idx].detach().cpu().numpy())
+                
+                # Single predict call for entire batch
+                predictions = model.predict(
+                    inputs=all_sensors,
+                    prediction_length=1,
+                    batch_size=len(all_sensors),
+                    predict_batches_jointly=False  # Set True to enable cross-learning
+                )
+                
+                # Extract median quantile for each prediction
+                pred_values = []
+                for pred in predictions:
+                    # pred shape: (1, n_quantiles, 1)
+                    median_idx = pred.shape[1] // 2
+                    pred_value = pred[0, median_idx, 0].item()
+                    pred_values.append(pred_value)
+                
+                # Reshape to (batch_size, n_sensors)
+                predictions_tensor = torch.tensor(pred_values, dtype=torch.float32).reshape(batch_size, n_sensors)
+                
+                # Ensure y has correct shape
+                if y.dim() == 3:
+                    y = y.squeeze(-1)  # (batch_size, n_sensors, 1) -> (batch_size, n_sensors)
+                
+                # Calculate loss for each sample in batch and store
+                for b in range(batch_size):
+                    if sample_idx + b < total_samples:
+                        sample_loss = loss_func(
+                            predictions_tensor[b:b+1], 
+                            y[b:b+1]
+                        )
+                        test_loss_list[sample_idx + b] = sample_loss.item()
+                        t_test_predicted_list[sample_idx + b] = predictions_tensor[b].cpu().numpy()
+                        t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
+                        t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
+            else:
+                # Just store ground truth if we exceed max_samples
+                if y.dim() == 3:
+                    y = y.squeeze(-1)
+                for b in range(batch_size):
+                    if sample_idx + b < total_samples:
+                        t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
+                        t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
+            
+            sample_idx += batch_size
+
+    avg_loss = sum(test_loss_list) / len(test_loss_list)
     
-    avg_loss = sum(test_loss_list)/len(test_loss_list)
+    history = cfg["history"]
+    stride = cfg["slide_stride"]
+    dataset = cfg["dataset"]
+    
+    np.savez_compressed(
+        f'results/{model_name}_data{dataset}_hist{history}_slide{stride}_{dataname}_results.npz',
+        predictions=t_test_predicted_list,
+        ground_truth=t_test_ground_list,
+        labels=t_test_labels_list,
+        losses=test_loss_list,
+        avg_loss=avg_loss,
+        n_sensors=n_sensors
+    )
+
     return avg_loss, [t_test_predicted_list, t_test_ground_list, t_test_labels_list]
+
+
+# def run_times_series_test(model_name, model, val_dataloader, cfg, dataname):
     
-    # i think this is wrong 
-    # Convert to NumPy arrays
-    # test_predicted_list = t_test_predicted_list.cpu().numpy()
-    # test_ground_list = t_test_ground_list.cpu().numpy()
-    # test_labels_list = t_test_labels_list.cpu().numpy()
-    # return avg_loss, [test_predicted_list, test_ground_list, test_labels_list]
+#     loss_func = torch.nn.MSELoss(reduction='mean')
+    
+#     n_sensors = val_dataloader.dataset.__getitem__(0)[0].shape[0]
+#     t_test_ground_list = np.zeros((len(val_dataloader), n_sensors))
+#     t_test_labels_list = np.zeros(len(val_dataloader))
+    
+#     test_loss_list = np.random.uniform(low=0, high=1.5, size=(len(val_dataloader)))
+#     t_test_predicted_list = np.random.uniform(low=-1.0, high=1.0, size=(len(val_dataloader), n_sensors))
+
+#     # REAL CODE: 
+#     # test_loss_list = []
+#     # t_test_predicted_list = np.zeros((len(val_dataloader), n_sensors))
+
+#     # max_samples = 3
+#     max_samples = len(val_dataloader)+1
+    
+#     if model_name == "timesfm" or model_name == "TimesFM":
+        
+#         # print("USING TIMESFM")
+#         device = "cuda" if torch.cuda.is_available() else "cpu"
+#         print(f'On device: {device}')
+        
+#         count = 0
+#         i = 0
+#         for x, y, labels in tqdm(val_dataloader):
+            
+#             count+=1
+#             if count < max_samples:
+#                 x = x.squeeze(0)
+#                 y = y.T
+                
+#                 x_list = [x_i.detach().cpu().numpy() for x_i in x]  # x can be on GPU or CPU
+#                 point_forecast, quantile_forecast = model.forecast(
+#                     horizon=1,
+#                     inputs=x_list
+#                 )
+                
+#                 predictions = torch.tensor(point_forecast, dtype=torch.float32)
+            
+#                 predictions = predictions.view(1, -1)  # ensures [1, 50]
+#                 y = y.view(1, -1)
+#                 loss = loss_func(predictions, y)
+                
+#                 test_loss_list[i] = loss.item()
+#                 t_test_predicted_list[i] = predictions.cpu().numpy()
+#             else:  
+#                 y = y.view(1, -1)                      # ensures [1, 50]
+            
+#             t_test_ground_list[i] = y.cpu().numpy()
+#             t_test_labels_list[i] = labels.cpu().numpy()
+#             i+=1
+
+#     if model_name=="chronos":
+        
+
+#     avg_loss = sum(test_loss_list)/len(test_loss_list)
+    
+#     history = cfg["history"]
+#     stride = cfg["slide_stride"]
+#     dataset = cfg["dataset"]
+    
+#     # saving the values
+#     # np.savez_compressed(
+#     #     f'results/{model_name}_data{dataset}_hist{history}_slide{stride}_test_results.npz',
+#     #     predictions=t_test_predicted_list[:max_samples],
+#     #     ground_truth=t_test_ground_list[:max_samples],
+#     #     labels=t_test_labels_list[:max_samples],
+#     #     losses=test_loss_list[:max_samples],
+#     #     avg_loss=avg_loss,
+#     #     n_sensors=n_sensors
+#     # )
+    
+#     np.savez_compressed(
+#         f'results/{model_name}_data{dataset}_hist{history}_slide{stride}_{dataname}_results.npz',
+#         predictions=t_test_predicted_list,
+#         ground_truth=t_test_ground_list,
+#         labels=t_test_labels_list,
+#         losses=test_loss_list,
+#         avg_loss=avg_loss,
+#         n_sensors=n_sensors
+#     )
+
+#     return avg_loss, [t_test_predicted_list, t_test_ground_list, t_test_labels_list]
         
 
 def run_test(device, model, dataloader, sensor_cols):
@@ -239,7 +387,7 @@ def get_attacks_info(dataset, evasion_type):
             attacks_obj.append((f'{dataset}_{i}', labels[i]))
     
     # change this TODO delete
-    return attacks_obj[:2]
+    return attacks_obj[:3]
 
 def load_attack_data(dataset, attack_name, attack_columns, config, return_benign_front=False, return_benign_back=False, evasion_type='cons', **kwargs):
 
@@ -311,12 +459,8 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
     attacks_obj = get_attacks_info(dataset, evasion_type)
     full_val_errors = np.abs(Xval_pred - Xval_true)
     per_sample_residuals = np.sum(full_val_errors, axis=1)
-    print("shape of full_val_errors:")
-    print(full_val_errors.shape)
     
     cusum_drift = np.mean(per_sample_residuals) + np.std(per_sample_residuals)
-    print("shape of drift before cusum is called: ")
-    print(cusum_drift.shape)
     cusum_val = cumulative_sum(Xval_pred, Xval_true, drift=cusum_drift)
     cusum_threshold = np.max(cusum_val) 
     # NOTE: CUSUM threshold can be multiplied by a scaling factor S here. GeCo uses S=2.
@@ -342,7 +486,8 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
 
         test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
         test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
-        _, test_result = eval_func(config["model_name"], model, test_dataloader, sensor_cols)
+        test_loss, test_result = eval_func(config["model_name"], model, test_dataloader, config, "test")
+        print("test loss: ", test_loss)
 
         print(f'====================** Test Result on all SWAT **=======================\n')
 
@@ -397,7 +542,7 @@ def run_detection_eval(device, model, config, dataset='TEP', detection_threshold
 
             test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
             test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
-            _, test_result = eval_func(config["model_name"], model, test_dataloader, sensor_cols)
+            _, test_result = eval_func(config["model_name"], model, test_dataloader, config, attack_name)
 
             print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
 
@@ -622,7 +767,8 @@ def run_detection_eval_custom(device, model, config, dataset='TEP', detection_th
         test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
         print("calling eval funct on dataloader:")
         print(len(test_dataloader.dataset))
-        _, test_result = eval_func(config["model_name"], model, test_dataloader, sensor_cols)
+        test_loss, test_result = eval_func(config["model_name"], model, test_dataloader, config, "test")
+        print("test loss: ", test_loss)
 
         print(f'====================** Test Result on all SWAT **=======================\n')
 
@@ -680,7 +826,8 @@ def run_detection_eval_custom(device, model, config, dataset='TEP', detection_th
             test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
             # print("in detection eval:", len(test_dataloader))
             
-            _, test_result = eval_func(config['model_name'], model, test_dataloader, sensor_cols)
+            test_loss, test_result = eval_func(config['model_name'], model, test_dataloader, config, attack_name)
+            print("test loss: ", test_loss)
             # _, test_result = eval_func(device, model, test_dataloader, sensor_cols)
 
             print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
@@ -1197,7 +1344,8 @@ def run_attribution_eval_true_timing(device, model, config, metrics_obj, dataset
         test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
         test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
         
-        _, test_result = eval_func(config['model_name'], model, test_dataloader, sensor_cols)
+        test_loss, test_result = eval_func(config['model_name'], model, test_dataloader, config, attack_name)
+        print("attack loss: ", test_loss)
         #_, test_result = eval_func(device, model, test_dataloader, sensor_cols)
 
         print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
@@ -1257,7 +1405,8 @@ def run_attribution_eval_detections(device, model, config, metrics_obj, dataset=
         test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
         test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
         
-        _, test_result = eval_func(config['model_name'], model, test_dataloader, sensor_cols)
+        test_loss, test_result = eval_func(config['model_name'], model, test_dataloader, config, attack_name)
+        print("attack loss: ", test_loss)
         #_, test_result = eval_func(device, model, test_dataloader, sensor_cols)
 
         print(f'====================** Test Result {attack_name} on {attack_columns} at true idx: {true_feat_idx_list} **=======================\n')
@@ -1312,3 +1461,91 @@ def run_attribution_eval_detections(device, model, config, metrics_obj, dataset=
 
     print('-' * 15)
 
+def run_combined_attribution_eval(
+    device, model, config, metrics_obj, dataset='TEP', evasion_type='cons',
+    eval_func=run_times_series_test, list_of_thresholds=None
+):       
+    n_features = config['node_num']
+    history = config['history']
+    attacks_obj = get_attacks_info(dataset, evasion_type)
+    
+    # Prepare containers for summary stats
+    first_timing_ranks, ideal_timing_ranks = [], []
+    first_timing_subranks, ideal_timing_subranks = [], []
+    first_timing_plc_ranks, ideal_timing_plc_ranks = [], []
+
+    if list_of_thresholds is None:
+        list_of_thresholds = []
+
+    # Loop over all attacks once
+    for attack_name, attack_columns in attacks_obj:
+
+        # Load and prepare data
+        Xtest, Ytest, true_feat_idx_list, sensor_cols, attack_start, _ = load_attack_data(
+            dataset, attack_name, attack_columns, config, evasion_type=evasion_type
+        )
+        test_dataset = TimeSeriesDataset(Xtest.T, Ytest, mode='test', config=config)
+        test_dataloader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0)
+
+        # Run inference ONCE
+        test_loss, test_result = eval_func(config['model_name'], model, test_dataloader, config, attack_name)
+        Xpred, Xtrue, Ytrue = test_result
+        full_errors = np.abs(Xtrue - Xpred)
+
+        print(f'\n=== Attack {attack_name} on {attack_columns} ===')
+        print(f'Attack loss: {test_loss}')
+
+        # True Timing Evaluation
+        first_mse = full_errors[0]
+        ideal_mse = full_errors[history]
+
+        first_timing_ranks.append(attack_utils.scores_to_rank(first_mse, true_feat_idx_list))
+        ideal_timing_ranks.append(attack_utils.scores_to_rank(ideal_mse, true_feat_idx_list))
+
+        first_timing_subranks.append(attack_utils.scores_to_subsystem_rank(dataset, first_mse, true_feat_idx_list))
+        ideal_timing_subranks.append(attack_utils.scores_to_subsystem_rank(dataset, ideal_mse, true_feat_idx_list))
+
+        first_timing_plc_ranks.append(attack_utils.scores_to_subsystem_rank(dataset, first_mse, true_feat_idx_list, use_plcs=True))
+        ideal_timing_plc_ranks.append(attack_utils.scores_to_subsystem_rank(dataset, ideal_mse, true_feat_idx_list, use_plcs=True))
+
+        # Detection Timing Evaluation
+        for threshold in list_of_thresholds:
+            key = f'{threshold}-per-attack'
+            first_alarm_idx = metrics_obj[key][attack_name]['detect_start']
+
+            if first_alarm_idx >= 0:
+                detection_mse = full_errors[first_alarm_idx]
+                rank = attack_utils.scores_to_rank(detection_mse, true_feat_idx_list)
+                sub_rank = attack_utils.scores_to_subsystem_rank(dataset, detection_mse, true_feat_idx_list)
+                plc_rank = attack_utils.scores_to_subsystem_rank(dataset, detection_mse, true_feat_idx_list, use_plcs=True)
+            else:
+                rank = sub_rank = plc_rank = -1
+
+            metrics_obj[key][attack_name].update({
+                'detection_rank': int(rank),
+                'detection_subrank': int(sub_rank),
+                'detection_plcrank': int(plc_rank),
+            })
+
+    # Summary stats
+    metrics_obj['first-timing-avgrank'] = np.mean(first_timing_ranks)
+    metrics_obj['ideal-timing-avgrank'] = np.mean(ideal_timing_ranks)
+    metrics_obj['first-timing-subrank'] = np.mean(first_timing_subranks)
+    metrics_obj['ideal-timing-subrank'] = np.mean(ideal_timing_subranks)
+    metrics_obj['first-timing-plcrank'] = np.mean(first_timing_plc_ranks)
+    metrics_obj['ideal-timing-plcrank'] = np.mean(ideal_timing_plc_ranks)
+
+    # Optional detection summary
+    for threshold in list_of_thresholds:
+        key = f'{threshold}-per-attack'
+        ranks = [metrics_obj[key][atk]['detection_rank'] for atk in metrics_obj[key] if metrics_obj[key][atk]['detection_rank'] > 0]
+        if len(ranks):
+            metrics_obj[f'{threshold}-detection-timing-avgrank'] = np.mean(ranks)
+            print(f'{key}: detection avgrank {np.mean(ranks)}')
+
+    print('-' * 15)
+    print(f'Avg true timing rank: {np.mean(first_timing_ranks)/n_features:.3f}')
+    print(f'Avg ideal timing rank: {np.mean(ideal_timing_ranks)/n_features:.3f}')
+    print('-' * 15)
+
+    return np.mean(first_timing_ranks), np.mean(ideal_timing_ranks)

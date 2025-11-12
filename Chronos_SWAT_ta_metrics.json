@@ -1,0 +1,214 @@
+{
+    "best-auroc-threshold-tpr": 0.0009111882282235707,
+    "best-auroc-threshold-fpr": 0.00031633969862367124,
+    "best-auroc-threshold-precision": 0.26744186046511625,
+    "best-auroc-threshold-recall": 0.0008918012446443458,
+    "best-auroc-threshold-F1": 0.0017776747241705795,
+    "best-auroc-threshold-FP": 102,
+    "best-auroc-threshold-TP": 9,
+    "best-auroc-threshold-SF1": 0.1258741258741259,
+    "best-auroc-threshold-TAF1": 0.1441416067861065,
+    "best-auroc-threshold-NAB": -0.7352941176470589,
+    "best-auroc-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": -1,
+            "recall": 0.0
+        },
+        "SWAT_1": {
+            "detect_start": 104,
+            "recall": 0.0022522522522522522
+        },
+        "SWAT_2": {
+            "detect_start": -1,
+            "recall": 0.0
+        }
+    },
+    "fpr1-threshold-tpr": 0.00829762897190826,
+    "fpr1-threshold-fpr": 0.010070147072853535,
+    "fpr1-threshold-precision": 0.0964398377647589,
+    "fpr1-threshold-recall": 0.00829762897190826,
+    "fpr1-threshold-F1": 0.01528052982023956,
+    "fpr1-threshold-FP": 1147,
+    "fpr1-threshold-TP": 21,
+    "fpr1-threshold-SF1": 0.034999999999999996,
+    "fpr1-threshold-TAF1": 0.13902351563866022,
+    "fpr1-threshold-NAB": -0.9310924369747899,
+    "fpr1-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": -1,
+            "recall": 0.0
+        },
+        "SWAT_1": {
+            "detect_start": 95,
+            "recall": 0.06306306306306306
+        },
+        "SWAT_2": {
+            "detect_start": -1,
+            "recall": 0.0
+        }
+    },
+    "fpr5-threshold-tpr": 0.029914115662744035,
+    "fpr5-threshold-fpr": 0.05007958705116167,
+    "fpr5-threshold-precision": 0.07180417888221881,
+    "fpr5-threshold-recall": 0.029914115662744035,
+    "fpr5-threshold-F1": 0.042233474750239496,
+    "fpr5-threshold-FP": 3131,
+    "fpr5-threshold-TP": 32,
+    "fpr5-threshold-SF1": 0.02003129890453834,
+    "fpr5-threshold-TAF1": 0.10727647041273376,
+    "fpr5-threshold-NAB": -0.9600748596381784,
+    "fpr5-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": 0,
+            "recall": 0.018201284796573874
+        },
+        "SWAT_1": {
+            "detect_start": 0,
+            "recall": 0.22072072072072071
+        },
+        "SWAT_2": {
+            "detect_start": 85,
+            "recall": 0.06824146981627296
+        }
+    },
+    "mse-val995-threshold-precision": 0.12687813021702837,
+    "mse-val995-threshold-recall": 0.002946821504042186,
+    "mse-val995-threshold-F1": 0.005759866613615263,
+    "mse-val995-threshold-FP": 435,
+    "mse-val995-threshold-TP": 12,
+    "mse-val995-threshold-SF1": 0.050104384133611686,
+    "mse-val995-threshold-TAF1": 0.1337401930915591,
+    "mse-val995-threshold-NAB": -0.9027484143763214,
+    "mse-val995-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": -1,
+            "recall": 0.0
+        },
+        "SWAT_1": {
+            "detect_start": 96,
+            "recall": 0.015765765765765764
+        },
+        "SWAT_2": {
+            "detect_start": -1,
+            "recall": 0.0
+        }
+    },
+    "mse-val1-threshold-precision": 0.6153846153846154,
+    "mse-val1-threshold-recall": 0.00031019173726759856,
+    "mse-val1-threshold-F1": 0.0006200709206115449,
+    "mse-val1-threshold-FP": 4,
+    "mse-val1-threshold-TP": 3,
+    "mse-val1-threshold-SF1": 0.15384615384615383,
+    "mse-val1-threshold-TAF1": 0.08671848377747875,
+    "mse-val1-threshold-NAB": -0.6666666666666666,
+    "mse-val1-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": -1,
+            "recall": 0.0
+        },
+        "SWAT_1": {
+            "detect_start": -1,
+            "recall": 0.0
+        },
+        "SWAT_2": {
+            "detect_start": -1,
+            "recall": 0.0
+        }
+    },
+    "cusum-total-threshold-precision": 0.10241420716678253,
+    "cusum-total-threshold-recall": 0.06283321378026793,
+    "cusum-total-threshold-F1": 0.0778833791918488,
+    "cusum-total-threshold-FP": 158,
+    "cusum-total-threshold-TP": 18,
+    "cusum-total-threshold-SF1": 0.17307692307692307,
+    "cusum-total-threshold-TAF1": 0.14080919786975005,
+    "cusum-total-threshold-NAB": -0.6482412060301508,
+    "cusum-total-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": -1,
+            "recall": 0.0
+        },
+        "SWAT_1": {
+            "detect_start": 97,
+            "recall": 0.4954954954954955
+        },
+        "SWAT_2": {
+            "detect_start": -1,
+            "recall": 0.0
+        }
+    },
+    "cusum-pf-threshold-precision": 0.11421476650818688,
+    "cusum-pf-threshold-recall": 0.9924778503712607,
+    "cusum-pf-threshold-F1": 0.20485476132357472,
+    "cusum-pf-threshold-FP": 4,
+    "cusum-pf-threshold-TP": 32,
+    "cusum-pf-threshold-SF1": 0.9411764705882353,
+    "cusum-pf-threshold-TAF1": 0.20028689015196527,
+    "cusum-pf-threshold-NAB": 0.8823529411764706,
+    "cusum-pf-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": 0,
+            "recall": 0.5845824411134903
+        },
+        "SWAT_1": {
+            "detect_start": 0,
+            "recall": 1.0
+        },
+        "SWAT_2": {
+            "detect_start": 0,
+            "recall": 1.0
+        }
+    },
+    "mse-pf-val995-threshold-precision": 0.44196362923386107,
+    "mse-pf-val995-threshold-recall": 0.6992109497683255,
+    "mse-pf-val995-threshold-F1": 0.5415925216803694,
+    "mse-pf-val995-threshold-FP": 24570,
+    "mse-pf-val995-threshold-TP": 32,
+    "mse-pf-val995-threshold-SF1": 0.0025980352358528865,
+    "mse-pf-val995-threshold-TAF1": 0.09331136021391981,
+    "mse-pf-val995-threshold-NAB": -0.9947994962011945,
+    "mse-pf-val995-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": 0,
+            "recall": 0.07601713062098502
+        },
+        "SWAT_1": {
+            "detect_start": 0,
+            "recall": 0.3333333333333333
+        },
+        "SWAT_2": {
+            "detect_start": 0,
+            "recall": 0.16010498687664043
+        }
+    },
+    "mse-pf-val1-threshold-precision": 0.9336279376739648,
+    "mse-pf-val1-threshold-recall": 0.6307748977336616,
+    "mse-pf-val1-threshold-F1": 0.7528867291449727,
+    "mse-pf-val1-threshold-FP": 1559,
+    "mse-pf-val1-threshold-TP": 30,
+    "mse-pf-val1-threshold-SF1": 0.03701418877236274,
+    "mse-pf-val1-threshold-TAF1": 0.16218032738205412,
+    "mse-pf-val1-threshold-NAB": -0.9260188087774295,
+    "mse-pf-val1-threshold-per-attack": {
+        "SWAT_0": {
+            "detect_start": 2,
+            "recall": 0.0010706638115631692
+        },
+        "SWAT_1": {
+            "detect_start": 0,
+            "recall": 0.04054054054054054
+        },
+        "SWAT_2": {
+            "detect_start": 257,
+            "recall": 0.007874015748031496
+        }
+    },
+    "mse-roc-auc": 0.1977555945824588,
+    "cusum-roc-auc": 0.4862674619701667,
+    "first-timing-avgrank": 2.3333333333333335,
+    "ideal-timing-avgrank": 27.0,
+    "first-timing-subrank": 1.3333333333333333,
+    "ideal-timing-subrank": 2.6666666666666665,
+    "first-timing-plcrank": 3.3333333333333335,
+    "ideal-timing-plcrank": 3.6666666666666665
+}

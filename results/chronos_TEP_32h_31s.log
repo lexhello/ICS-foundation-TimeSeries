@@ -1,0 +1,181 @@
+Running model: Chronos on dataset: TEP
+On device: cuda
+Chronos TEP: run #1
+No scaler provided, trying to load from checkpoints directory...
+history:  32
+Validation samples: 620
+Validation batches: 39
+On device: cuda
+avg validation loss of  Chronos is: 
+0.4591066356966415
+atttack objects length:  3
+On device: cuda
+====================** Test Result cons_p2s_s1 on s1 at true idx: [0] **=======================
+
+On device: cuda
+====================** Test Result cons_p2s_s2 on s2 at true idx: [1] **=======================
+
+On device: cuda
+====================** Test Result cons_p2s_s3 on s3 at true idx: [2] **=======================
+
+THRESHOLD IS NONE
+shape of all_mses:  (41904,)
+shape of all_labels:  (41904,)
+all labels:  [0. 0. 0. ... 1. 1. 1.]
+FPR:  [0.00000000e+00 1.00321027e-04 3.00963082e-04 ... 9.99799358e-01
+ 1.00000000e+00 1.00000000e+00]
+TPR:  [0.         0.         0.         ... 0.99908333 0.99908333 1.        ]
+thresholds:  [       inf 0.78380682 0.71633028 0.6984737  0.67781159 0.66581221
+ 0.66121393 0.66049221 0.64919961 0.64709111 0.64692911 0.64272069
+ 0.64234792 0.63785618 0.63591689 0.61909174 0.61690319 0.61517764
+ 0.61368066 0.61181769]
+auroc_threshold: 0.5360933618146312
+auroc_threshold shape:  ()
+Best AUROC threshold at: 0.5361. TPR: 0.0056 FPR 0.0051
+precision: 0.3013698630136986
+recall: 0.0055
+F1: 0.01080284802356985
+FP: 105
+TP: 3
+SF1: 0.05405405405405406
+TAF1: 0.37577098000124604
+NAB: -0.8888888888888888
+best-auroc-threshold cons_p2s_s1: detect t=1, recall = 0.0055
+best-auroc-threshold cons_p2s_s2: detect t=1, recall = 0.005
+best-auroc-threshold cons_p2s_s3: detect t=1, recall = 0.006
+------------------------------
+FPR 1% threshold at: 0.4408. TPR: 0.0090 FPR 0.0102
+this_pred:  (41904,)
+all saved metrics: 
+{'best-auroc-threshold-tpr': np.float64(0.005583333333333333), 'best-auroc-threshold-fpr': np.float64(0.005116372391653291), 'best-auroc-threshold-precision': np.float64(0.3013698630136986), 'best-auroc-threshold-recall': np.float64(0.0055), 'best-auroc-threshold-F1': np.float64(0.01080284802356985), 'best-auroc-threshold-FP': 105, 'best-auroc-threshold-TP': 3, 'best-auroc-threshold-SF1': 0.05405405405405406, 'best-auroc-threshold-TAF1': np.float64(0.37577098000124604), 'best-auroc-threshold-NAB': np.float64(-0.8888888888888888), 'best-auroc-threshold-per-attack': {'cons_p2s_s1': {'detect_start': 1, 'recall': np.float64(0.0055)}, 'cons_p2s_s2': {'detect_start': 1, 'recall': np.float64(0.005)}, 'cons_p2s_s3': {'detect_start': 1, 'recall': np.float64(0.006)}}, 'fpr1-threshold-tpr': np.float64(0.009), 'fpr1-threshold-fpr': np.float64(0.010232744783306581)}
+precision: 0.26277372262773724
+recall: 0.009
+F1: 0.017403915881073238
+FP: 177
+TP: 3
+SF1: 0.03278688524590164
+TAF1: 0.33991664180835895
+NAB: -0.9333333333333333
+fpr1-threshold cons_p2s_s1: detect t=1, recall = 0.00975
+fpr1-threshold cons_p2s_s2: detect t=1, recall = 0.0085
+fpr1-threshold cons_p2s_s3: detect t=1, recall = 0.00875
+------------------------------
+FPR 5% threshold at: 0.3595. TPR: 0.0343 FPR 0.0503
+precision: 0.21548117154811716
+recall: 0.034333333333333334
+F1: 0.05922944220816562
+FP: 1236
+TP: 3
+SF1: 0.004830917874396135
+TAF1: 0.29944373257482476
+NAB: -0.9903147699757869
+fpr5-threshold cons_p2s_s1: detect t=0, recall = 0.04425
+fpr5-threshold cons_p2s_s2: detect t=0, recall = 0.029
+fpr5-threshold cons_p2s_s3: detect t=1, recall = 0.02975
+------------------------------
+Standard 99.5% validation threshold at: 0.6540.
+precision: 0.175
+recall: 0.0005833333333333334
+F1: 0.0011627906976744188
+FP: 33
+TP: 3
+SF1: 0.15384615384615385
+TAF1: 0.25929846108270405
+NAB: -0.7222222222222222
+mse-val995-threshold cons_p2s_s1: detect t=1, recall = 0.0005
+mse-val995-threshold cons_p2s_s2: detect t=1001, recall = 0.0005
+mse-val995-threshold cons_p2s_s3: detect t=3001, recall = 0.00075
+------------------------------
+Standard max validation threshold at: 2.1454.
+precision: 0
+recall: 0.0
+F1: 0
+FP: -1
+TP: 0
+SF1: 0
+TAF1: 0.0
+NAB: -1.0
+mse-val1-threshold cons_p2s_s1: detect t=-1, recall = 0.0
+mse-val1-threshold cons_p2s_s2: detect t=-1, recall = 0.0
+mse-val1-threshold cons_p2s_s3: detect t=-1, recall = 0.0
+------------------------------
+Standard CUSUM threshold at: 164.0663.
+precision: 0
+recall: 0.0
+F1: 0
+FP: -1
+TP: 0
+SF1: 0
+TAF1: 0.0
+NAB: -1.0
+cusum-total-threshold cons_p2s_s1: detect t=-1, recall = 0.0
+cusum-total-threshold cons_p2s_s2: detect t=-1, recall = 0.0
+cusum-total-threshold cons_p2s_s3: detect t=-1, recall = 0.0
+------------------------------
+With per-feature CUSUM thresholds.
+precision: 0.4454117438038554
+recall: 0.8356666666666667
+F1: 0.5810975256417686
+FP: 1128
+TP: 3
+SF1: 0.005291005291005291
+TAF1: 0.202658726679596
+NAB: -0.9893899204244032
+cusum-pf-threshold cons_p2s_s1: detect t=0, recall = 0.733
+cusum-pf-threshold cons_p2s_s2: detect t=0, recall = 0.8125
+cusum-pf-threshold cons_p2s_s3: detect t=0, recall = 0.9615
+------------------------------
+With per-feature 99.5 thresholds.
+precision: 0.3034895568008151
+recall: 0.19858333333333333
+F1: 0.2400765665927866
+FP: 4125
+TP: 3
+SF1: 0.0014524328249818446
+TAF1: 0.39297810201137723
+NAB: -0.997093023255814
+mse-pf-val995-threshold cons_p2s_s1: detect t=0, recall = 0.1885
+mse-pf-val995-threshold cons_p2s_s2: detect t=0, recall = 0.21125
+mse-pf-val995-threshold cons_p2s_s3: detect t=0, recall = 0.196
+------------------------------
+With per-feature max thresholds.
+precision: 0.28444444444444444
+recall: 0.064
+F1: 0.10448979591836734
+FP: 1638
+TP: 3
+SF1: 0.0036496350364963507
+TAF1: 0.36798167926943204
+NAB: -0.9926873857404022
+mse-pf-val1-threshold cons_p2s_s1: detect t=0, recall = 0.06575
+mse-pf-val1-threshold cons_p2s_s2: detect t=0, recall = 0.06675
+mse-pf-val1-threshold cons_p2s_s3: detect t=0, recall = 0.0595
+------------------------------
+ROC AUC: 0.439
+ROC AUC with CUSUM: 0.495
+Loading TEP attack cons_p2s_s1...
+No scaler provided, loading from models directory.
+On device: cuda
+
+=== Attack cons_p2s_s1 on s1 ===
+Attack loss: 0.3142983810596335
+Loading TEP attack cons_p2s_s2...
+No scaler provided, loading from models directory.
+On device: cuda
+
+=== Attack cons_p2s_s2 on s2 ===
+Attack loss: 0.29715571676618585
+Loading TEP attack cons_p2s_s3...
+No scaler provided, loading from models directory.
+On device: cuda
+
+=== Attack cons_p2s_s3 on s3 ===
+Attack loss: 0.2982265579360818
+---------------
+Avg true timing rank: 0.031
+Avg ideal timing rank: 0.881
+---------------
+========================================
+Final stats for Chronos. ROC AUC 0.439 CUSUM ROC AUC 0.495 AvgRank: 1.667
+Writing Chronos_TEP_ta_metrics.json
+Done

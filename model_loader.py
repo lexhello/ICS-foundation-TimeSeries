@@ -1,11 +1,14 @@
 import sys
 sys.path.append("/pwwl/python_libs")
+import os
+os.environ["HF_HOME"] = "/pwwl/hf_cache"
 import numpy as np
 import torch
 import timesfm
 from utils import gen_utils, ctown_utils
 from data_loader import load_train_data, get_loaders, TimeSeriesDataset, load_test_data
 from nixtla import NixtlaClient
+from chronos import Chronos2Pipeline
 import eval_utils
 # import model_utils
 import json
@@ -19,7 +22,7 @@ from eval_utils import run_times_series_test
 import importlib
 importlib.reload(eval_utils)
 
-def load_model(model_name: str, cfg):
+def load_model(model_name: str, cfg, device):
     
     # Minimal example: one id, 5 time points
     df = pd.DataFrame({
@@ -63,11 +66,14 @@ def load_model(model_name: str, cfg):
     if model_name == "Chronos" or model_name == "chronos":
         
         #TODO: change device here
-        pipeline = BaseChronosPipeline.from_pretrained(
-            "amazon/chronos-bolt-base",
-            device_map="mps",  # use "cpu" for CPU inference and "mps" for Apple Silicon
-            dtype=torch.bfloat16,
-        )
+        # pipeline = BaseChronosPipeline.from_pretrained(
+        #     "amazon/chronos-bolt-base",
+        #     device_map=device,  # use "cpu" for CPU inference and "mps" for Apple Silicon
+        #     dtype=torch.bfloat16,
+        # )
+        
+        pipeline = Chronos2Pipeline.from_pretrained("amazon/chronos-2", device_map=device)
+
         return pipeline
         
         
@@ -91,11 +97,11 @@ def load_test(model_name, dataset):
     do_train = False
     do_test = True
     evasion_type = "cons"
-    batch_size = 1
+    batch_size = 16
     
     # training params
     train_params_epochs = 1
-    no_transform = True
+    no_transform = False
 
     print(f'{model_type} {dataset}: run #{run_number}')
 
@@ -118,12 +124,13 @@ def load_test(model_name, dataset):
     # context length
     run_number = 1
     cfg.update({
+        'dataset': dataset,
         'history': 32,
         'run_number': run_number,
-        'slide_stride': 31,
+        'slide_stride': 1,
     })
     print("history: ", cfg['history'])
-    model = load_model(model_name, cfg)
+    model = load_model(model_name, cfg, device)
     
     # NOTE: Added a custom function, since the RICSS CTOWN dataset is stored across 52 training files
     # model_dir = 'best_models_50epoch'
@@ -148,7 +155,8 @@ def load_test(model_name, dataset):
  
 
     if do_test:
-        avg_loss, val_result = run_times_series_test(model_name, model, val_dataloader, cfg)
+        avg_loss, val_result = run_times_series_test(model_name, model, val_dataloader, cfg, "validation")
+
         print("avg validation loss of ", model_name, "is: ")
         print(avg_loss)
         
@@ -159,9 +167,13 @@ def load_test(model_name, dataset):
         final_roc_auc = all_saved_metrics['mse-roc-auc']
         final_cusum_roc_auc = all_saved_metrics['cusum-roc-auc']
         
-        eval_utils.run_attribution_eval_detections(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
-        final_first_timing_avgrank, final_ideal_timing_avgrank = eval_utils.run_attribution_eval_true_timing(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
-
+        
+        # eval_utils.run_attribution_eval_detections(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
+        # final_first_timing_avgrank, final_ideal_timing_avgrank = eval_utils.run_attribution_eval_true_timing(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
+        
+        # this does both the earlier calls, but without repeat evals
+        final_first_timing_avgrank, final_ideal_timing_avgrank = eval_utils.run_combined_attribution_eval(device, model, cfg, all_saved_metrics, dataset=dataset, evasion_type=evasion_type)
+        
         print('==' * 20)
         
         if evasion_type == 'cons':

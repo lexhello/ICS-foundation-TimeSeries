@@ -1,104 +1,96 @@
 {
-    "best-auroc-threshold-tpr": 0.004375,
+    "best-auroc-threshold-tpr": 0.0045,
     "best-auroc-threshold-fpr": 0.004213483146067416,
-    "best-auroc-threshold-precision": 0.288135593220339,
-    "best-auroc-threshold-recall": 0.00425,
-    "best-auroc-threshold-F1": 0.008376447400837645,
-    "best-auroc-threshold-FP": 66,
-    "best-auroc-threshold-TP": 2,
+    "best-auroc-threshold-precision": 0.29608938547486036,
+    "best-auroc-threshold-recall": 0.004416666666666667,
+    "best-auroc-threshold-F1": 0.00870350603497824,
+    "best-auroc-threshold-FP": 99,
+    "best-auroc-threshold-TP": 3,
     "best-auroc-threshold-SF1": 0.05714285714285715,
-    "best-auroc-threshold-TAF1": 0.37392426277915963,
+    "best-auroc-threshold-TAF1": 0.373947372504339,
     "best-auroc-threshold-NAB": -0.8823529411764706,
     "best-auroc-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": 1,
-            "recall": 0.004,
-            "detection_rank": 1,
-            "detection_subrank": 6,
-            "detection_plcrank": 2
+            "recall": 0.004
         },
         "cons_p2s_s2": {
             "detect_start": 1,
-            "recall": 0.0045,
-            "detection_rank": 6,
-            "detection_subrank": 6,
-            "detection_plcrank": 2
+            "recall": 0.0045
+        },
+        "cons_p2s_s3": {
+            "detect_start": 1,
+            "recall": 0.00475
         }
     },
-    "fpr1-threshold-tpr": 0.009,
-    "fpr1-threshold-fpr": 0.0103330658105939,
-    "fpr1-threshold-precision": 0.2608695652173913,
-    "fpr1-threshold-recall": 0.009,
-    "fpr1-threshold-F1": 0.01739971000483325,
-    "fpr1-threshold-FP": 120,
-    "fpr1-threshold-TP": 2,
-    "fpr1-threshold-SF1": 0.03225806451612903,
-    "fpr1-threshold-TAF1": 0.3464490989088665,
-    "fpr1-threshold-NAB": -0.9344262295081968,
+    "fpr1-threshold-tpr": 0.00875,
+    "fpr1-threshold-fpr": 0.010032102728731942,
+    "fpr1-threshold-precision": 0.26119402985074625,
+    "fpr1-threshold-recall": 0.00875,
+    "fpr1-threshold-F1": 0.01693275278180939,
+    "fpr1-threshold-FP": 177,
+    "fpr1-threshold-TP": 3,
+    "fpr1-threshold-SF1": 0.03278688524590164,
+    "fpr1-threshold-TAF1": 0.3426132292969462,
+    "fpr1-threshold-NAB": -0.9333333333333333,
     "fpr1-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": 1,
-            "recall": 0.0095,
-            "detection_rank": 1,
-            "detection_subrank": 6,
-            "detection_plcrank": 2
+            "recall": 0.0095
         },
         "cons_p2s_s2": {
             "detect_start": 1,
-            "recall": 0.0085,
-            "detection_rank": 6,
-            "detection_subrank": 6,
-            "detection_plcrank": 2
+            "recall": 0.0085
+        },
+        "cons_p2s_s3": {
+            "detect_start": 1,
+            "recall": 0.00825
         }
     },
-    "fpr5-threshold-tpr": 0.0335,
+    "fpr5-threshold-tpr": 0.03166666666666667,
     "fpr5-threshold-fpr": 0.05026083467094703,
-    "fpr5-threshold-precision": 0.2113564668769716,
-    "fpr5-threshold-recall": 0.0335,
-    "fpr5-threshold-F1": 0.05783340526542943,
-    "fpr5-threshold-FP": 828,
-    "fpr5-threshold-TP": 2,
+    "fpr5-threshold-precision": 0.20212765957446807,
+    "fpr5-threshold-recall": 0.03166666666666667,
+    "fpr5-threshold-F1": 0.05475504322766571,
+    "fpr5-threshold-FP": 1242,
+    "fpr5-threshold-TP": 3,
     "fpr5-threshold-SF1": 0.004807692307692308,
-    "fpr5-threshold-TAF1": 0.29548690756352586,
+    "fpr5-threshold-TAF1": 0.2836405264537372,
     "fpr5-threshold-NAB": -0.9903614457831326,
     "fpr5-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": 0,
-            "recall": 0.04025,
-            "detection_rank": 1,
-            "detection_subrank": 3,
-            "detection_plcrank": 2
+            "recall": 0.04025
         },
         "cons_p2s_s2": {
             "detect_start": 0,
-            "recall": 0.02675,
-            "detection_rank": 2,
-            "detection_subrank": 4,
-            "detection_plcrank": 1
+            "recall": 0.02675
+        },
+        "cons_p2s_s3": {
+            "detect_start": 0,
+            "recall": 0.028
         }
     },
-    "mse-val995-threshold-precision": 0,
-    "mse-val995-threshold-recall": 0.0,
-    "mse-val995-threshold-F1": 0,
-    "mse-val995-threshold-FP": -1,
-    "mse-val995-threshold-TP": 0,
-    "mse-val995-threshold-SF1": 0,
-    "mse-val995-threshold-TAF1": 0.0,
-    "mse-val995-threshold-NAB": -1.0,
+    "mse-val995-threshold-precision": 0.27184466019417475,
+    "mse-val995-threshold-recall": 0.0023333333333333335,
+    "mse-val995-threshold-F1": 0.004626951995373048,
+    "mse-val995-threshold-FP": 69,
+    "mse-val995-threshold-TP": 3,
+    "mse-val995-threshold-SF1": 0.07999999999999999,
+    "mse-val995-threshold-TAF1": 0.36632527443115953,
+    "mse-val995-threshold-NAB": -0.8333333333333334,
     "mse-val995-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": -1,
-            "recall": 0.0,
-            "detection_rank": -1,
-            "detection_subrank": -1,
-            "detection_plcrank": -1
+            "detect_start": 1,
+            "recall": 0.00225
         },
         "cons_p2s_s2": {
-            "detect_start": -1,
-            "recall": 0.0,
-            "detection_rank": -1,
-            "detection_subrank": -1,
-            "detection_plcrank": -1
+            "detect_start": 1,
+            "recall": 0.002
+        },
+        "cons_p2s_s3": {
+            "detect_start": 1,
+            "recall": 0.00275
         }
     },
     "mse-val1-threshold-precision": 0,
@@ -112,130 +104,111 @@
     "mse-val1-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": -1,
-            "recall": 0.0,
-            "detection_rank": -1,
-            "detection_subrank": -1,
-            "detection_plcrank": -1
+            "recall": 0.0
         },
         "cons_p2s_s2": {
             "detect_start": -1,
-            "recall": 0.0,
-            "detection_rank": -1,
-            "detection_subrank": -1,
-            "detection_plcrank": -1
+            "recall": 0.0
+        },
+        "cons_p2s_s3": {
+            "detect_start": -1,
+            "recall": 0.0
         }
     },
-    "cusum-total-threshold-precision": 0,
+    "cusum-total-threshold-precision": 0.0,
     "cusum-total-threshold-recall": 0.0,
     "cusum-total-threshold-F1": 0,
-    "cusum-total-threshold-FP": -1,
+    "cusum-total-threshold-FP": 12,
     "cusum-total-threshold-TP": 0,
     "cusum-total-threshold-SF1": 0,
-    "cusum-total-threshold-TAF1": 0.0,
+    "cusum-total-threshold-TAF1": 0,
     "cusum-total-threshold-NAB": -1.0,
     "cusum-total-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": -1,
-            "recall": 0.0,
-            "detection_rank": -1,
-            "detection_subrank": -1,
-            "detection_plcrank": -1
+            "recall": 0.0
         },
         "cons_p2s_s2": {
             "detect_start": -1,
-            "recall": 0.0,
-            "detection_rank": -1,
-            "detection_subrank": -1,
-            "detection_plcrank": -1
+            "recall": 0.0
+        },
+        "cons_p2s_s3": {
+            "detect_start": -1,
+            "recall": 0.0
         }
     },
-    "cusum-pf-threshold-precision": 0.286389346316317,
-    "cusum-pf-threshold-recall": 1.0,
-    "cusum-pf-threshold-F1": 0.445260755830133,
-    "cusum-pf-threshold-FP": 0,
-    "cusum-pf-threshold-TP": 2,
-    "cusum-pf-threshold-SF1": 1.0,
-    "cusum-pf-threshold-TAF1": 0.445260755830133,
-    "cusum-pf-threshold-NAB": 1.0,
+    "cusum-pf-threshold-precision": 0.39405797101449275,
+    "cusum-pf-threshold-recall": 0.67975,
+    "cusum-pf-threshold-F1": 0.4988990825688073,
+    "cusum-pf-threshold-FP": 1305,
+    "cusum-pf-threshold-TP": 3,
+    "cusum-pf-threshold-SF1": 0.004576659038901603,
+    "cusum-pf-threshold-TAF1": 0.31380703770760926,
+    "cusum-pf-threshold-NAB": -0.9908256880733946,
     "cusum-pf-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": 0,
-            "recall": 1.0,
-            "detection_rank": 1,
-            "detection_subrank": 3,
-            "detection_plcrank": 2
+            "recall": 0.7465
         },
         "cons_p2s_s2": {
             "detect_start": 0,
-            "recall": 1.0,
-            "detection_rank": 2,
-            "detection_subrank": 4,
-            "detection_plcrank": 1
+            "recall": 0.7225
+        },
+        "cons_p2s_s3": {
+            "detect_start": 0,
+            "recall": 0.57025
         }
     },
-    "mse-pf-val995-threshold-precision": 0.286368843069874,
-    "mse-pf-val995-threshold-recall": 1.0,
-    "mse-pf-val995-threshold-F1": 0.4452359750667854,
-    "mse-pf-val995-threshold-FP": 0,
-    "mse-pf-val995-threshold-TP": 2,
-    "mse-pf-val995-threshold-SF1": 1.0,
-    "mse-pf-val995-threshold-TAF1": 0.4452359750667854,
-    "mse-pf-val995-threshold-NAB": 1.0,
+    "mse-pf-val995-threshold-precision": 0.2907949790794979,
+    "mse-pf-val995-threshold-recall": 0.19691666666666666,
+    "mse-pf-val995-threshold-F1": 0.23482063003080592,
+    "mse-pf-val995-threshold-FP": 4227,
+    "mse-pf-val995-threshold-TP": 3,
+    "mse-pf-val995-threshold-SF1": 0.0014174344436569811,
+    "mse-pf-val995-threshold-TAF1": 0.3818706247139412,
+    "mse-pf-val995-threshold-NAB": -0.9971631205673759,
     "mse-pf-val995-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": 0,
-            "recall": 1.0,
-            "detection_rank": 1,
-            "detection_subrank": 3,
-            "detection_plcrank": 2
+            "recall": 0.209
         },
         "cons_p2s_s2": {
             "detect_start": 0,
-            "recall": 1.0,
-            "detection_rank": 2,
-            "detection_subrank": 4,
-            "detection_plcrank": 1
+            "recall": 0.181
+        },
+        "cons_p2s_s3": {
+            "detect_start": 0,
+            "recall": 0.20075
         }
     },
-    "mse-pf-val1-threshold-precision": 0.286368843069874,
-    "mse-pf-val1-threshold-recall": 1.0,
-    "mse-pf-val1-threshold-F1": 0.4452359750667854,
-    "mse-pf-val1-threshold-FP": 0,
-    "mse-pf-val1-threshold-TP": 2,
-    "mse-pf-val1-threshold-SF1": 1.0,
-    "mse-pf-val1-threshold-TAF1": 0.4452359750667854,
-    "mse-pf-val1-threshold-NAB": 1.0,
+    "mse-pf-val1-threshold-precision": 0.2869133918351774,
+    "mse-pf-val1-threshold-recall": 0.06266666666666666,
+    "mse-pf-val1-threshold-F1": 0.10286574105738322,
+    "mse-pf-val1-threshold-FP": 1557,
+    "mse-pf-val1-threshold-TP": 3,
+    "mse-pf-val1-threshold-SF1": 0.0038387715930902114,
+    "mse-pf-val1-threshold-TAF1": 0.3688677577283166,
+    "mse-pf-val1-threshold-NAB": -0.9923076923076923,
     "mse-pf-val1-threshold-per-attack": {
         "cons_p2s_s1": {
             "detect_start": 0,
-            "recall": 1.0,
-            "detection_rank": 1,
-            "detection_subrank": 3,
-            "detection_plcrank": 2
+            "recall": 0.06775
         },
         "cons_p2s_s2": {
             "detect_start": 0,
-            "recall": 1.0,
-            "detection_rank": 2,
-            "detection_subrank": 4,
-            "detection_plcrank": 1
+            "recall": 0.05825
+        },
+        "cons_p2s_s3": {
+            "detect_start": 0,
+            "recall": 0.062
         }
     },
-    "mse-roc-auc": 0.44923955407303373,
-    "cusum-roc-auc": 0.5,
-    "best-auroc-threshold-detection-timing-avgrank": 3.5,
-    "fpr1-threshold-detection-timing-avgrank": 3.5,
-    "fpr5-threshold-detection-timing-avgrank": 1.5,
-    "mse-val995-threshold-detection-timing-avgrank": NaN,
-    "mse-val1-threshold-detection-timing-avgrank": NaN,
-    "cusum-total-threshold-detection-timing-avgrank": NaN,
-    "cusum-pf-threshold-detection-timing-avgrank": 1.5,
-    "mse-pf-val995-threshold-detection-timing-avgrank": 1.5,
-    "mse-pf-val1-threshold-detection-timing-avgrank": 1.5,
-    "first-timing-avgrank": 1.5,
-    "ideal-timing-avgrank": 46.0,
-    "first-timing-subrank": 3.5,
-    "ideal-timing-subrank": 5.0,
-    "first-timing-plcrank": 1.5,
-    "ideal-timing-plcrank": 8.5
+    "mse-roc-auc": 0.43948638142054575,
+    "cusum-roc-auc": 0.47453159276350987,
+    "first-timing-avgrank": 1.6666666666666667,
+    "ideal-timing-avgrank": 46.666666666666664,
+    "first-timing-subrank": 3.6666666666666665,
+    "ideal-timing-subrank": 5.333333333333333,
+    "first-timing-plcrank": 1.3333333333333333,
+    "ideal-timing-plcrank": 8.333333333333334
 }
