@@ -84,95 +84,80 @@ def run_times_series_test(model_name, model, val_dataloader, cfg, dataname):
         sample_idx = 0
         for x, y, labels in tqdm(val_dataloader):
             
-            if sample_idx < max_samples:
-                x = x.squeeze(0)
-                y = y.T
-                
-                x_list = [x_i.detach().cpu().numpy() for x_i in x]
+            batch_size = x.shape[0]
+        
+            for b in range(batch_size):  # <-- process one sample at a time
+                if sample_idx >= max_samples:
+                    break
+
+                x_sample = x[b].view(n_sensors, -1)  # ensure 2D (n_sensors, history_length)
+                y_sample = y[b]                       # (n_sensors,)
+                label_sample = labels[b]
+
+                # prepare list of 1D arrays per sensor
+                x_list = [x_i.detach().cpu().numpy().ravel() for x_i in x_sample]
+
                 point_forecast, quantile_forecast = model.forecast(
                     horizon=1,
                     inputs=x_list
                 )
-                
-                predictions = torch.tensor(point_forecast, dtype=torch.float32)
-            
-                predictions = predictions.view(1, -1)
-                y = y.view(1, -1)
-                loss = loss_func(predictions, y)
-                
+
+                predictions = torch.tensor(point_forecast, dtype=torch.float32).view(1, -1)
+                y_tensor = y_sample.view(1, -1)
+
+                loss = loss_func(predictions, y_tensor)
+
                 test_loss_list[sample_idx] = loss.item()
                 t_test_predicted_list[sample_idx] = predictions.cpu().numpy()
-            else:  
-                y = y.view(1, -1)
-            
-            t_test_ground_list[sample_idx] = y.cpu().numpy()
-            t_test_labels_list[sample_idx] = labels.cpu().numpy()
-            sample_idx += 1
+                t_test_ground_list[sample_idx] = y_tensor.cpu().numpy()
+                t_test_labels_list[sample_idx] = label_sample.cpu().numpy()
+
+                sample_idx += 1
+
 
     if model_name == "chronos" or model_name == "Chronos":
-        
+
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f'On device: {device}')
-        
+        print(f'On device: {device} (batched, multivariate)')
+
         sample_idx = 0
         for x, y, labels in tqdm(val_dataloader):
-            
             # x shape: (batch_size, n_sensors, history_length)
             # y shape: (batch_size, n_sensors) or (batch_size, n_sensors, 1)
-            
             batch_size = x.shape[0]
-            
-            if sample_idx < max_samples:
-                # Flatten all sensors from all batch samples into one list
-                # This allows Chronos to process the entire batch efficiently
-                all_sensors = []
-                for batch_idx in range(batch_size):
-                    for sensor_idx in range(n_sensors):
-                        all_sensors.append(x[batch_idx, sensor_idx].detach().cpu().numpy())
-                
-                # Single predict call for entire batch
-                predictions = model.predict(
-                    inputs=all_sensors,
-                    prediction_length=1,
-                    batch_size=len(all_sensors),
-                    predict_batches_jointly=False  # Set True to enable cross-learning
-                )
-                
-                # Extract median quantile for each prediction
-                pred_values = []
-                for pred in predictions:
-                    # pred shape: (1, n_quantiles, 1)
-                    median_idx = pred.shape[1] // 2
-                    pred_value = pred[0, median_idx, 0].item()
-                    pred_values.append(pred_value)
-                
-                # Reshape to (batch_size, n_sensors)
-                predictions_tensor = torch.tensor(pred_values, dtype=torch.float32).reshape(batch_size, n_sensors)
-                
-                # Ensure y has correct shape
-                if y.dim() == 3:
-                    y = y.squeeze(-1)  # (batch_size, n_sensors, 1) -> (batch_size, n_sensors)
-                
-                # Calculate loss for each sample in batch and store
-                for b in range(batch_size):
-                    if sample_idx + b < total_samples:
-                        sample_loss = loss_func(
-                            predictions_tensor[b:b+1], 
-                            y[b:b+1]
-                        )
-                        test_loss_list[sample_idx + b] = sample_loss.item()
-                        t_test_predicted_list[sample_idx + b] = predictions_tensor[b].cpu().numpy()
-                        t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
-                        t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
-            else:
-                # Just store ground truth if we exceed max_samples
-                if y.dim() == 3:
-                    y = y.squeeze(-1)
-                for b in range(batch_size):
-                    if sample_idx + b < total_samples:
-                        t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
-                        t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
-            
+
+            if sample_idx >= max_samples:
+                break
+
+            # Ensure y has correct shape
+            if y.dim() == 3:
+                y = y.squeeze(-1)  # (batch_size, n_sensors, 1) -> (batch_size, n_sensors)
+
+            # Prepare multivariate inputs for Chronos: list of (history_length, n_sensors)
+            inputs = [x[b].T.detach().cpu().numpy() for b in range(batch_size)]
+
+            # Run Chronos batched multivariate prediction
+            predictions = model.predict(
+                inputs=inputs,                # list of (history_length, n_sensors)
+                prediction_length=1,          # one-step forecast
+                batch_size=batch_size,
+                predict_batches_jointly=True  # joint multivariate prediction
+            )
+
+            # Convert list of arrays to numpy: shape (batch_size, n_sensors)
+            # Each element of predictions is (prediction_length, n_sensors)
+            preds_array = np.vstack([pred[0] for pred in predictions])
+            preds_tensor = torch.tensor(preds_array, dtype=torch.float32)
+
+            # Compute loss and store outputs
+            for b in range(batch_size):
+                if sample_idx + b < total_samples:
+                    sample_loss = loss_func(preds_tensor[b:b+1], y[b:b+1])
+                    test_loss_list[sample_idx + b] = sample_loss.item()
+                    t_test_predicted_list[sample_idx + b] = preds_tensor[b].cpu().numpy()
+                    t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
+                    t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
+
             sample_idx += batch_size
 
     avg_loss = sum(test_loss_list) / len(test_loss_list)
