@@ -73,8 +73,8 @@ def run_times_series_test(model_name, model, val_dataloader, cfg, dataname):
     test_loss_list = np.zeros(total_samples)
     t_test_predicted_list = np.zeros((total_samples, n_sensors))
 
-    max_samples = total_samples + 1
-    max_sample = 60
+    # max_samples = total_samples + 1
+    max_samples = 2
     
     if model_name == "timesfm" or model_name == "TimesFM":
         
@@ -387,7 +387,7 @@ def get_attacks_info(dataset, evasion_type):
             attacks_obj.append((f'{dataset}_{i}', labels[i]))
     
     # change this TODO delete
-    return attacks_obj[:3]
+    return attacks_obj[:2]
 
 def load_attack_data(dataset, attack_name, attack_columns, config, return_benign_front=False, return_benign_back=False, evasion_type='cons', **kwargs):
 
