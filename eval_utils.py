@@ -87,33 +87,31 @@ def run_times_series_test(model_name, model, val_dataloader, cfg, dataname):
             batch_size = x.shape[0]
         
             for b in range(batch_size):  # <-- process one sample at a time
-                if sample_idx >= max_samples:
-                    break
-
                 x_sample = x[b].view(n_sensors, -1)  # ensure 2D (n_sensors, history_length)
                 y_sample = y[b]                       # (n_sensors,)
                 label_sample = labels[b]
-
-                # prepare list of 1D arrays per sensor
-                x_list = [x_i.detach().cpu().numpy().ravel() for x_i in x_sample]
-
-                point_forecast, quantile_forecast = model.forecast(
-                    horizon=1,
-                    inputs=x_list
-                )
-
-                predictions = torch.tensor(point_forecast, dtype=torch.float32).view(1, -1)
+                
                 y_tensor = y_sample.view(1, -1)
+                
+                if sample_idx < max_samples:
+                    # prepare list of 1D arrays per sensor
+                    x_list = [x_i.detach().cpu().numpy().ravel() for x_i in x_sample]
 
-                loss = loss_func(predictions, y_tensor)
+                    point_forecast, quantile_forecast = model.forecast(
+                        horizon=1,
+                        inputs=x_list
+                    )
 
-                test_loss_list[sample_idx] = loss.item()
+                    predictions = torch.tensor(point_forecast, dtype=torch.float32).view(1, -1)
+                    loss = loss_func(predictions, y_tensor)
+
+                    test_loss_list[sample_idx] = loss.item()
+  
                 t_test_predicted_list[sample_idx] = predictions.cpu().numpy()
                 t_test_ground_list[sample_idx] = y_tensor.cpu().numpy()
                 t_test_labels_list[sample_idx] = label_sample.cpu().numpy()
 
                 sample_idx += 1
-
 
     if model_name == "chronos" or model_name == "Chronos":
 
@@ -121,43 +119,79 @@ def run_times_series_test(model_name, model, val_dataloader, cfg, dataname):
         print(f'On device: {device} (batched, multivariate)')
 
         sample_idx = 0
+        
         for x, y, labels in tqdm(val_dataloader):
             # x shape: (batch_size, n_sensors, history_length)
-            # y shape: (batch_size, n_sensors) or (batch_size, n_sensors, 1)
+            # y shape: (batch_size, n_sensors)
             batch_size = x.shape[0]
 
-            if sample_idx >= max_samples:
-                break
-
-            # Ensure y has correct shape
+            # Ensure y has correct shape (already done, but good practice)
             if y.dim() == 3:
-                y = y.squeeze(-1)  # (batch_size, n_sensors, 1) -> (batch_size, n_sensors)
+                y = y.squeeze(-1) # (batch_size, n_sensors, 1) -> (batch_size, n_sensors)
 
-            # Prepare multivariate inputs for Chronos: list of (history_length, n_sensors)
-            inputs = [x[b].T.detach().cpu().numpy() for b in range(batch_size)]
+            if sample_idx < max_samples:
+        
+                # --- CRITICAL CHANGE: Prepare multivariate inputs as a list of dictionaries ---
+                # The 'target' inside the dict MUST have shape (n_sensors, history_length)
+                # Your x shape is (batch_size, n_sensors, history_length)
+                
+                inputs = []
+                for b in range(batch_size):
+                    # x[b] is (n_sensors, history_length)
+                    
+                    # We need to detach, move to CPU, and convert to numpy
+                    target_array = x[b].detach().cpu().numpy() 
+                    
+                    # Append the required dictionary structure
+                    inputs.append({"target": target_array})
 
-            # Run Chronos batched multivariate prediction
-            predictions = model.predict(
-                inputs=inputs,                # list of (history_length, n_sensors)
-                prediction_length=1,          # one-step forecast
-                batch_size=batch_size,
-                predict_batches_jointly=True  # joint multivariate prediction
-            )
+                # Run Chronos batched multivariate prediction
+                predictions = model.predict(
+                    inputs=inputs,               # list of dicts with {"target": (n_sensors, history_length)}
+                    prediction_length=1,         # one-step forecast
+                    batch_size=batch_size,
+                    predict_batches_jointly=True
+                )
 
-            # Convert list of arrays to numpy: shape (batch_size, n_sensors)
-            # Each element of predictions is (prediction_length, n_sensors)
-            preds_array = np.vstack([pred[0] for pred in predictions])
-            preds_tensor = torch.tensor(preds_array, dtype=torch.float32)
+                print("shape of predictions: ", len(predictions), predictions[0].shape)
+                preds_list = []
+                
+                # We assume the 0.5 quantile (median) is at index 10 (out of 0 to 20)
+                MEDIAN_INDEX = 10 
+                
+                for pred in predictions:
+                    # pred shape: (53, 21, 1). 
+                    
+                    # 1. Select the single prediction time step (the last dimension, index 0).
+                    #    pred[:, :, 0] -> Shape: (53, 21)
+                    
+                    # 2. Select the median quantile (index 10) from the second dimension.
+                    #    pred[:, 10, 0] -> Shape: (53,)
+                    
+                    median_pred = pred[:, MEDIAN_INDEX, 0]
+                    
+                    preds_list.append(median_pred) # Appends a (53,) array
 
-            # Compute loss and store outputs
-            for b in range(batch_size):
-                if sample_idx + b < total_samples:
-                    sample_loss = loss_func(preds_tensor[b:b+1], y[b:b+1])
-                    test_loss_list[sample_idx + b] = sample_loss.item()
-                    t_test_predicted_list[sample_idx + b] = preds_tensor[b].cpu().numpy()
-                    t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
-                    t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
+                # Stack the 16 arrays of shape (53,) vertically.
+                # Resulting shape: (batch_size, n_sensors) -> (16, 53)
+                preds_array = np.vstack(preds_list) 
+                preds_tensor = torch.tensor(preds_array, dtype=torch.float32) # Final Shape: (16, 53)
 
+                # Compute loss and store outputs
+                for b in range(batch_size):
+                    if sample_idx + b < total_samples:
+                        # Loss tensors are now correctly (1, 53) vs (1, 53)
+                        sample_loss = loss_func(preds_tensor[b:b+1], y[b:b+1])
+                        test_loss_list[sample_idx + b] = sample_loss.item()
+                        t_test_predicted_list[sample_idx + b] = preds_tensor[b].cpu().numpy()
+                        t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
+                        t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
+            else:
+                for b in range(batch_size):
+                    if sample_idx + b < total_samples:
+                        t_test_ground_list[sample_idx + b] = y[b].cpu().numpy()
+                        t_test_labels_list[sample_idx + b] = labels[b].cpu().numpy()
+                
             sample_idx += batch_size
 
     avg_loss = sum(test_loss_list) / len(test_loss_list)

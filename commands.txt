@@ -29,4 +29,4 @@ pip install "chronos-forecasting>=2.0"
 
 
 python3 model_loader.py timesfm TEP | tee results/run.log
-python3 model_loader.py Chronos TEP | tee results/chronos.log
+python3 model_loader.py Chronos TEP | tee results/chronosTEP32h31s.log

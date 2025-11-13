@@ -1,96 +1,80 @@
 {
-    "best-auroc-threshold-tpr": 0.005583333333333333,
-    "best-auroc-threshold-fpr": 0.005116372391653291,
-    "best-auroc-threshold-precision": 0.3013698630136986,
-    "best-auroc-threshold-recall": 0.0055,
-    "best-auroc-threshold-F1": 0.01080284802356985,
-    "best-auroc-threshold-FP": 105,
-    "best-auroc-threshold-TP": 3,
-    "best-auroc-threshold-SF1": 0.05405405405405406,
-    "best-auroc-threshold-TAF1": 0.37577098000124604,
-    "best-auroc-threshold-NAB": -0.8888888888888888,
+    "best-auroc-threshold-tpr": 0.8605,
+    "best-auroc-threshold-fpr": 0.05838683788121991,
+    "best-auroc-threshold-precision": 0.8553498198086243,
+    "best-auroc-threshold-recall": 0.860375,
+    "best-auroc-threshold-F1": 0.8578550507883094,
+    "best-auroc-threshold-FP": 402,
+    "best-auroc-threshold-TP": 2,
+    "best-auroc-threshold-SF1": 0.009852216748768473,
+    "best-auroc-threshold-TAF1": 0.4158206339306822,
+    "best-auroc-threshold-NAB": -0.9801980198019802,
     "best-auroc-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": 1,
-            "recall": 0.0055
+            "detect_start": 28,
+            "recall": 0.8095
         },
         "cons_p2s_s2": {
-            "detect_start": 1,
-            "recall": 0.005
-        },
-        "cons_p2s_s3": {
-            "detect_start": 1,
-            "recall": 0.006
+            "detect_start": 215,
+            "recall": 0.91125
         }
     },
-    "fpr1-threshold-tpr": 0.009,
-    "fpr1-threshold-fpr": 0.010232744783306581,
-    "fpr1-threshold-precision": 0.26277372262773724,
-    "fpr1-threshold-recall": 0.009,
-    "fpr1-threshold-F1": 0.017403915881073238,
-    "fpr1-threshold-FP": 177,
-    "fpr1-threshold-TP": 3,
-    "fpr1-threshold-SF1": 0.03278688524590164,
-    "fpr1-threshold-TAF1": 0.33991664180835895,
-    "fpr1-threshold-NAB": -0.9333333333333333,
+    "fpr1-threshold-tpr": 0.802375,
+    "fpr1-threshold-fpr": 0.010032102728731942,
+    "fpr1-threshold-precision": 0.970077074202811,
+    "fpr1-threshold-recall": 0.802375,
+    "fpr1-threshold-F1": 0.8782923992611342,
+    "fpr1-threshold-FP": 128,
+    "fpr1-threshold-TP": 2,
+    "fpr1-threshold-SF1": 0.030303030303030307,
+    "fpr1-threshold-TAF1": 0.5662675055814897,
+    "fpr1-threshold-NAB": -0.9384615384615385,
     "fpr1-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": 1,
-            "recall": 0.00975
+            "detect_start": 710,
+            "recall": 0.7355
         },
         "cons_p2s_s2": {
-            "detect_start": 1,
-            "recall": 0.0085
-        },
-        "cons_p2s_s3": {
-            "detect_start": 1,
-            "recall": 0.00875
+            "detect_start": 363,
+            "recall": 0.86925
         }
     },
-    "fpr5-threshold-tpr": 0.034333333333333334,
-    "fpr5-threshold-fpr": 0.05026083467094703,
-    "fpr5-threshold-precision": 0.21548117154811716,
-    "fpr5-threshold-recall": 0.034333333333333334,
-    "fpr5-threshold-F1": 0.05922944220816562,
-    "fpr5-threshold-FP": 1236,
-    "fpr5-threshold-TP": 3,
-    "fpr5-threshold-SF1": 0.004830917874396135,
-    "fpr5-threshold-TAF1": 0.29944373257482476,
-    "fpr5-threshold-NAB": -0.9903147699757869,
+    "fpr5-threshold-tpr": 0.8495,
+    "fpr5-threshold-fpr": 0.05016051364365971,
+    "fpr5-threshold-precision": 0.871952784192969,
+    "fpr5-threshold-recall": 0.8495,
+    "fpr5-threshold-F1": 0.860579967076105,
+    "fpr5-threshold-FP": 352,
+    "fpr5-threshold-TP": 2,
+    "fpr5-threshold-SF1": 0.011235955056179775,
+    "fpr5-threshold-TAF1": 0.4282993994433865,
+    "fpr5-threshold-NAB": -0.9774011299435028,
     "fpr5-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": 0,
-            "recall": 0.04425
+            "detect_start": 230,
+            "recall": 0.79475
         },
         "cons_p2s_s2": {
-            "detect_start": 0,
-            "recall": 0.029
-        },
-        "cons_p2s_s3": {
-            "detect_start": 1,
-            "recall": 0.02975
+            "detect_start": 215,
+            "recall": 0.90425
         }
     },
-    "mse-val995-threshold-precision": 0.175,
-    "mse-val995-threshold-recall": 0.0005833333333333334,
-    "mse-val995-threshold-F1": 0.0011627906976744188,
-    "mse-val995-threshold-FP": 33,
-    "mse-val995-threshold-TP": 3,
-    "mse-val995-threshold-SF1": 0.15384615384615385,
-    "mse-val995-threshold-TAF1": 0.25929846108270405,
-    "mse-val995-threshold-NAB": -0.7222222222222222,
+    "mse-val995-threshold-precision": 0,
+    "mse-val995-threshold-recall": 0.0,
+    "mse-val995-threshold-F1": 0,
+    "mse-val995-threshold-FP": -1,
+    "mse-val995-threshold-TP": 0,
+    "mse-val995-threshold-SF1": 0,
+    "mse-val995-threshold-TAF1": 0.0,
+    "mse-val995-threshold-NAB": -1.0,
     "mse-val995-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": 1,
-            "recall": 0.0005
+            "detect_start": -1,
+            "recall": 0.0
         },
         "cons_p2s_s2": {
-            "detect_start": 1001,
-            "recall": 0.0005
-        },
-        "cons_p2s_s3": {
-            "detect_start": 3001,
-            "recall": 0.00075
+            "detect_start": -1,
+            "recall": 0.0
         }
     },
     "mse-val1-threshold-precision": 0,
@@ -107,10 +91,6 @@
             "recall": 0.0
         },
         "cons_p2s_s2": {
-            "detect_start": -1,
-            "recall": 0.0
-        },
-        "cons_p2s_s3": {
             "detect_start": -1,
             "recall": 0.0
         }
@@ -131,84 +111,68 @@
         "cons_p2s_s2": {
             "detect_start": -1,
             "recall": 0.0
-        },
-        "cons_p2s_s3": {
-            "detect_start": -1,
-            "recall": 0.0
         }
     },
-    "cusum-pf-threshold-precision": 0.4454117438038554,
-    "cusum-pf-threshold-recall": 0.8356666666666667,
-    "cusum-pf-threshold-F1": 0.5810975256417686,
-    "cusum-pf-threshold-FP": 1128,
-    "cusum-pf-threshold-TP": 3,
-    "cusum-pf-threshold-SF1": 0.005291005291005291,
-    "cusum-pf-threshold-TAF1": 0.202658726679596,
-    "cusum-pf-threshold-NAB": -0.9893899204244032,
+    "cusum-pf-threshold-precision": 0.9400056866647711,
+    "cusum-pf-threshold-recall": 0.8265,
+    "cusum-pf-threshold-F1": 0.8796062258879872,
+    "cusum-pf-threshold-FP": 4,
+    "cusum-pf-threshold-TP": 2,
+    "cusum-pf-threshold-SF1": 0.5,
+    "cusum-pf-threshold-TAF1": 0.48839852892009356,
+    "cusum-pf-threshold-NAB": 0.3333333333333333,
     "cusum-pf-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": 0,
-            "recall": 0.733
+            "detect_start": 1380,
+            "recall": 0.655
         },
         "cons_p2s_s2": {
-            "detect_start": 0,
-            "recall": 0.8125
-        },
-        "cons_p2s_s3": {
-            "detect_start": 0,
-            "recall": 0.9615
+            "detect_start": 8,
+            "recall": 0.998
         }
     },
-    "mse-pf-val995-threshold-precision": 0.3034895568008151,
-    "mse-pf-val995-threshold-recall": 0.19858333333333333,
-    "mse-pf-val995-threshold-F1": 0.2400765665927866,
-    "mse-pf-val995-threshold-FP": 4125,
-    "mse-pf-val995-threshold-TP": 3,
-    "mse-pf-val995-threshold-SF1": 0.0014524328249818446,
-    "mse-pf-val995-threshold-TAF1": 0.39297810201137723,
-    "mse-pf-val995-threshold-NAB": -0.997093023255814,
+    "mse-pf-val995-threshold-precision": 0.8990976210008204,
+    "mse-pf-val995-threshold-recall": 0.822,
+    "mse-pf-val995-threshold-F1": 0.8588219929476296,
+    "mse-pf-val995-threshold-FP": 301,
+    "mse-pf-val995-threshold-TP": 2,
+    "mse-pf-val995-threshold-SF1": 0.013114754098360654,
+    "mse-pf-val995-threshold-TAF1": 0.14107701002156273,
+    "mse-pf-val995-threshold-NAB": -0.9736842105263158,
     "mse-pf-val995-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": 0,
-            "recall": 0.1885
+            "detect_start": 55,
+            "recall": 0.70225
         },
         "cons_p2s_s2": {
-            "detect_start": 0,
-            "recall": 0.21125
-        },
-        "cons_p2s_s3": {
-            "detect_start": 0,
-            "recall": 0.196
+            "detect_start": 55,
+            "recall": 0.94175
         }
     },
-    "mse-pf-val1-threshold-precision": 0.28444444444444444,
-    "mse-pf-val1-threshold-recall": 0.064,
-    "mse-pf-val1-threshold-F1": 0.10448979591836734,
-    "mse-pf-val1-threshold-FP": 1638,
-    "mse-pf-val1-threshold-TP": 3,
-    "mse-pf-val1-threshold-SF1": 0.0036496350364963507,
-    "mse-pf-val1-threshold-TAF1": 0.36798167926943204,
-    "mse-pf-val1-threshold-NAB": -0.9926873857404022,
+    "mse-pf-val1-threshold-precision": 0.9420961204400695,
+    "mse-pf-val1-threshold-recall": 0.8135,
+    "mse-pf-val1-threshold-F1": 0.8730882747518112,
+    "mse-pf-val1-threshold-FP": 2,
+    "mse-pf-val1-threshold-TP": 2,
+    "mse-pf-val1-threshold-SF1": 0.6666666666666666,
+    "mse-pf-val1-threshold-TAF1": 0.7683831320194955,
+    "mse-pf-val1-threshold-NAB": 1.0,
     "mse-pf-val1-threshold-per-attack": {
         "cons_p2s_s1": {
-            "detect_start": 0,
-            "recall": 0.06575
+            "detect_start": 424,
+            "recall": 0.687
         },
         "cons_p2s_s2": {
-            "detect_start": 0,
-            "recall": 0.06675
-        },
-        "cons_p2s_s3": {
-            "detect_start": 0,
-            "recall": 0.0595
+            "detect_start": 240,
+            "recall": 0.94
         }
     },
-    "mse-roc-auc": 0.4390797719368646,
-    "cusum-roc-auc": 0.49465485386570357,
-    "first-timing-avgrank": 1.6666666666666667,
-    "ideal-timing-avgrank": 46.666666666666664,
-    "first-timing-subrank": 3.3333333333333335,
-    "ideal-timing-subrank": 5.666666666666667,
-    "first-timing-plcrank": 1.3333333333333333,
-    "ideal-timing-plcrank": 8.333333333333334
+    "mse-roc-auc": 0.9652619382022471,
+    "cusum-roc-auc": 0.5525,
+    "first-timing-avgrank": 2.5,
+    "ideal-timing-avgrank": 3.0,
+    "first-timing-subrank": 3.0,
+    "ideal-timing-subrank": 2.0,
+    "first-timing-plcrank": 1.5,
+    "ideal-timing-plcrank": 2.0
 }
